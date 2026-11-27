@@ -1,62 +1,70 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import App from '../App';
 
-describe('Koushik Ahmed Portfolio — Elite Signature Features', () => {
-  it('renders Engineering Mode by default and switches to Client Mode via Dual-Lens switcher', () => {
-    render(<App />);
-    expect(
-      screen.getByText(/Final-year Computer Science student and full-stack developer/i)
-    ).toBeInTheDocument();
-
-    const clientBtn = document.getElementById('lens-client-btn');
-    fireEvent.click(clientBtn);
-
-    expect(
-      screen.getByText(/I partner with ambitious businesses, gyms, brands/i)
-    ).toBeInTheDocument();
+describe('Koushik Ahmed Portfolio v2.0 — Blueprint Verification', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    window.history.replaceState({}, '', '/');
   });
 
-  it('toggles Live X-Ray Architecture Mode via HUD button', () => {
+  it('supports ?lens=client URL routing and switches lenses without losing DOM height sizers', () => {
+    window.history.replaceState({}, '', '/?lens=client');
+    render(<App />);
+
+    expect(document.getElementById('lens-client-btn')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+
+    fireEvent.click(document.getElementById('lens-engineer-btn'));
+    expect(document.getElementById('lens-engineer-btn')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+  });
+
+  it('toggles X-Ray Mode on single-key X and NEVER hijacks Ctrl+X (Cut)', () => {
     render(<App />);
     expect(document.documentElement.getAttribute('data-xray')).toBe('false');
 
-    const xrayBtn = document.getElementById('xray-toggle-btn');
-    fireEvent.click(xrayBtn);
+    // Ctrl+X must NOT toggle X-Ray Mode
+    fireEvent.keyDown(window, { key: 'x', ctrlKey: true });
+    expect(document.documentElement.getAttribute('data-xray')).toBe('false');
 
+    // Single-key X (outside inputs) MUST toggle X-Ray Mode
+    fireEvent.keyDown(window, { key: 'x' });
     expect(document.documentElement.getAttribute('data-xray')).toBe('true');
-    expect(screen.getByText(/X-RAY ARCHITECTURE HUD/i)).toBeInTheDocument();
   });
 
-  it('opens Global Command Palette and executes Interactive Terminal shokti Easter egg', () => {
+  it('opens Command Palette on `/` key and executes Terminal shokti chip', () => {
     render(<App />);
-    const cmdkBtn = document.getElementById('cmdk-open-btn');
-    fireEvent.click(cmdkBtn);
+    fireEvent.keyDown(window, { key: '/' });
 
     const terminalTab = document.getElementById('palette-tab-terminal');
     fireEvent.click(terminalTab);
 
-    const termInput = document.getElementById('terminal-cli-input');
-    fireEvent.change(termInput, { target: { value: 'shokti' } });
-    fireEvent.submit(termInput.closest('form'));
+    const shoktiChip = screen.getByRole('button', { name: 'shokti' });
+    fireEvent.click(shoktiChip);
 
     expect(
       screen.getByText(/distraction-free React Native workout tracker/i)
     ).toBeInTheDocument();
   });
 
-  it('opens Deep-Dive Case Study modal for Fitness Factory', () => {
+  it('updates URL to /work/fitness-factory and shows honest Concept Prototype framing in Case Study', () => {
     render(<App />);
     const csBtn = document.getElementById('case-study-btn-fitness-factory');
     fireEvent.click(csBtn);
 
+    expect(window.location.pathname).toBe('/work/fitness-factory');
     expect(
-      screen.getByText(/Lead Product Designer & Frontend Engineer/i)
+      screen.getByText(/Product Design & Frontend Engineering \(Concept Pitch\)/i)
     ).toBeInTheDocument();
   });
 
-  it('updates 60-Second Scope Estimator roadmap dynamically when Mobile App is selected', () => {
+  it('updates unified 4-step Scope Estimator when Mobile App is selected', () => {
     render(<App />);
     const mobileTypeBtn = document.getElementById('est-type-mobile-app');
     fireEvent.click(mobileTypeBtn);

@@ -1,27 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 
-function detectFineCursorSupport() {
+function detectFineHoverSupport() {
   if (typeof window === 'undefined' || !window.matchMedia) return false;
-  const finePointer = window.matchMedia('(pointer: fine)').matches;
-  const reducedMotion = window.matchMedia(
-    '(prefers-reduced-motion: reduce)'
-  ).matches;
-  return finePointer && !reducedMotion;
+  return (
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
 }
 
 /**
- * Contextual Desktop Cursor — 7px Alabaster dot + lagging precision ring with monospace micro-labels.
- * Automatically disabled on touch / coarse pointer devices and reduced-motion setups.
+ * Contextual Desktop Cursor (§6.3):
+ * 8px Alabaster dot + 32px lagging hairline ring.
+ * Disabled on touch, reduced motion, when X-Ray Mode is active, and hidden over text inputs.
  */
 export default function CustomCursor() {
-  const { cursorLabel } = usePortfolio();
-  const [enabled] = useState(detectFineCursorSupport);
+  const { cursorLabel, xray, reducedMotion } = usePortfolio();
+  const [fineSupported] = useState(detectFineHoverSupport);
+  const [overInput, setOverInput] = useState(false);
   const dotRef = useRef(null);
   const ringRef = useRef(null);
 
+  const active = fineSupported && !xray && !reducedMotion;
+
   useEffect(() => {
-    if (!enabled) return undefined;
+    if (!active) return undefined;
 
     let targetX = -100;
     let targetY = -100;
@@ -32,6 +35,14 @@ export default function CustomCursor() {
     const onMove = (e) => {
       targetX = e.clientX;
       targetY = e.clientY;
+      const tag = e.target?.tagName;
+      const isTextControl =
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        e.target?.isContentEditable;
+      setOverInput(Boolean(isTextControl));
+
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
       }
@@ -57,9 +68,9 @@ export default function CustomCursor() {
       window.removeEventListener('mousemove', onMove);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [enabled]);
+  }, [active]);
 
-  if (!enabled) return null;
+  if (!active || overInput) return null;
 
   return (
     <>

@@ -2,24 +2,26 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 function localEdgeTelemetryPlugin() {
+  const sendEdgeJson = (_req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-store');
+    res.end(
+      JSON.stringify({
+        ok: true,
+        colo: 'LOCAL',
+        country: '',
+        protocol: 'HTTP/2',
+        runtime: 'Vite Dev',
+        serverTime: new Date().toISOString(),
+      })
+    );
+  };
+
   return {
     name: 'local-edge-telemetry',
     configureServer(server) {
-      server.middlewares.use('/api/telemetry', (req, res) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Cache-Control', 'no-store');
-        res.end(
-          JSON.stringify({
-            ok: true,
-            colo: 'DAC-DEV',
-            city: 'Dhaka',
-            country: 'BD',
-            protocol: 'HTTP/2',
-            runtime: 'Vite Local Edge Sim',
-            serverTime: new Date().toISOString(),
-          })
-        );
-      });
+      server.middlewares.use('/api/edge', sendEdgeJson);
+      server.middlewares.use('/api/telemetry', sendEdgeJson);
 
       server.middlewares.use('/api/contact', (req, res) => {
         if (req.method !== 'POST') {

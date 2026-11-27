@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789//·';
 
 /**
- * Crisp 240ms kinetic text-scramble hook for Dual-Lens switcher transitions.
- * Respects `prefers-reduced-motion: reduce`.
+ * Crisp 250ms kinetic text-scramble hook for Dual-Lens headline transitions.
+ * Respects both OS `prefers-reduced-motion` and manual `[data-reduced-motion="true"]`.
  */
-export function useScrambleText(targetText, durationMs = 240) {
+export function useScrambleText(targetText, durationMs = 250) {
   const [display, setDisplay] = useState(targetText);
   const firstRender = useRef(true);
 
@@ -18,8 +18,9 @@ export function useScrambleText(targetText, durationMs = 240) {
 
     const prefersReduced =
       typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      ((window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+        document.documentElement.getAttribute('data-reduced-motion') === 'true');
 
     let rafId = null;
     const start = performance.now();
@@ -62,7 +63,7 @@ export function useScrambleText(targetText, durationMs = 240) {
 }
 
 /**
- * Helper handler to attach cursor-tracked radial specular coordinates to `.specular-card`
+ * Writes cursor coordinates to CSS variables once per pointer move on fine-pointer devices.
  */
 export function handleSpecularMouseMove(e) {
   const rect = e.currentTarget.getBoundingClientRect();

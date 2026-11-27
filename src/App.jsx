@@ -21,23 +21,25 @@ function PortfolioShell() {
     openPalette,
     closePalette,
     toggleXray,
+    reducedMotion,
     activeCaseStudy,
     shoktiModalOpen,
+    announcement,
   } = usePortfolio();
 
-  // Weighted inertial smooth scroll via Lenis (disabled automatically for reduced-motion or open modals)
+  // v2 §3.4: Lenis runs ONLY on fine-pointer devices and when reduced-motion is off
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
-    const reduced = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches;
-    if (reduced) return undefined;
+    if (typeof window === 'undefined' || !window.matchMedia || reducedMotion) {
+      return undefined;
+    }
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    if (!finePointer) return undefined;
 
     let lenis;
     let rafId = null;
     try {
       lenis = new Lenis({
-        duration: 1.05,
+        duration: 1.0,
         smoothWheel: true,
       });
 
@@ -47,35 +49,57 @@ function PortfolioShell() {
       };
       rafId = requestAnimationFrame(raf);
     } catch {
-      // Fallback to native browser scroll in non-DOM test environments
+      // Fallback to native browser scroll
     }
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
       if (lenis) lenis.destroy();
     };
-  }, []);
+  }, [reducedMotion]);
 
-  // Global Keyboard Shortcuts: Cmd/Ctrl + K (Command Palette), Cmd/Ctrl + X (X-Ray Mode), Escape
+  // v2 §0.1 #1 & §4.4 Keyboard Shortcuts:
+  // - Cmd/Ctrl + K or `/` (outside inputs) -> Command Palette
+  // - Single-key `X` (NO Cmd/Ctrl modifier, so OS Cut is never hijacked!) -> X-Ray Mode
   useEffect(() => {
+    const isTypingTarget = (el) => {
+      if (!el) return false;
+      const tag = el.tagName;
+      return (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        el.isContentEditable
+      );
+    };
+
     const handleKeyDown = (e) => {
       const isMod = e.metaKey || e.ctrlKey;
       const key = e.key.toLowerCase();
 
       if (isMod && key === 'k') {
         e.preventDefault();
-        if (paletteOpen) {
-          closePalette();
-        } else {
-          openPalette('commands');
-        }
-      } else if (isMod && key === 'x') {
-        const tag = document.activeElement?.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        if (paletteOpen) closePalette();
+        else openPalette('commands');
+        return;
+      }
+
+      if (e.key === 'Escape' && paletteOpen) {
+        closePalette();
+        return;
+      }
+
+      // Never intercept unmodified keys while typing in a form input or with Ctrl/Cmd/Alt held
+      if (isMod || e.altKey || isTypingTarget(document.activeElement)) {
+        return;
+      }
+
+      if (key === 'x' && !paletteOpen) {
         e.preventDefault();
         toggleXray();
-      } else if (e.key === 'Escape' && paletteOpen) {
-        closePalette();
+      } else if (e.key === '/' && !paletteOpen) {
+        e.preventDefault();
+        openPalette('commands');
       }
     };
 
@@ -83,7 +107,6 @@ function PortfolioShell() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [paletteOpen, openPalette, closePalette, toggleXray]);
 
-  // Lock body scroll when full-screen Case Study or Command Palette is open
   useEffect(() => {
     const anyModal = Boolean(paletteOpen || activeCaseStudy || shoktiModalOpen);
     document.body.style.overflow = anyModal ? 'hidden' : '';
@@ -94,12 +117,21 @@ function PortfolioShell() {
 
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
+      {/* Screen-Reader Polite Live Region (§9.2) */}
+      <div role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </div>
+
       <div className="film-grain" aria-hidden="true" />
       <CustomCursor />
       <XRayOverlay />
       <NavbarHUD />
 
-      <main>
+      <main id="main-content">
         <HeroSection />
         <PillarsSection />
         <WorkSection />

@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 /**
- * XRayOverlay — Laser scanline sweep + bottom-left Live Performance & Edge Telemetry HUD
+ * XRayOverlay — 350ms cyan scanline sweep + honest live FPS/Viewport/Scroll/Edge HUD (§4.1)
  */
 export default function XRayOverlay() {
-  const { xray, scanPulse, telemetry, lens, theme } = usePortfolio();
+  const { xray, scanPulse, telemetry, lens } = usePortfolio();
   const [fps, setFps] = useState(60);
   const [viewport, setViewport] = useState({
     w: typeof window !== 'undefined' ? window.innerWidth : 1440,
@@ -38,7 +38,8 @@ export default function XRayOverlay() {
     const handleScroll = () => {
       const docHeight =
         document.documentElement.scrollHeight - window.innerHeight;
-      const pct = docHeight > 0 ? Math.round((window.scrollY / docHeight) * 100) : 0;
+      const pct =
+        docHeight > 0 ? Math.round((window.scrollY / docHeight) * 100) : 0;
       setScrollPct(Math.max(0, Math.min(100, pct)));
     };
 
@@ -55,22 +56,21 @@ export default function XRayOverlay() {
 
   return (
     <>
-      {scanPulse > 0 && <div key={scanPulse} className="xray-scanline" />}
+      {scanPulse > 0 && (
+        <div key={scanPulse} className="xray-scanline" aria-hidden="true" />
+      )}
       {xray && (
-        <aside className="xray-perf-hud" aria-live="polite">
+        <aside className="xray-perf-hud" aria-hidden="true">
           <div style={{ fontWeight: 600, marginBottom: 4, color: '#ffffff' }}>
             // X-RAY ARCHITECTURE HUD
           </div>
           <div>
-            RENDER_LOOP: {fps} FPS · VIEWPORT: {viewport.w}×{viewport.h}px
+            FPS: {fps} · VIEWPORT: {viewport.w}×{viewport.h}px · SCROLL:{' '}
+            {scrollPct}%
           </div>
           <div>
-            SCROLL_DEPTH: {scrollPct}% · LENS: {lens.toUpperCase()} · THEME:{' '}
-            {theme.toUpperCase()}
-          </div>
-          <div>
-            EDGE_NODE: {telemetry.colo} ({telemetry.country}) · RTT:{' '}
-            {telemetry.latencyMs}ms
+            STATE: lens={lens} · EDGE: CF colo={telemetry.colo}
+            {telemetry.latencyMs !== null ? ` · ${telemetry.latencyMs}ms` : ''}
           </div>
         </aside>
       )}

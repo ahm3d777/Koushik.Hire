@@ -11,7 +11,7 @@ import { usePortfolio } from '../context/PortfolioContext';
 import { soundEngine } from '../utils/soundEngine';
 
 /**
- * Reusable 7-Block Deep-Dive Case Study Drawer + Shokti Lab Product Roadmap Modal
+ * Reusable 8-Block Deep-Dive Case Study Route/Sheet (/work/<slug>) + Shokti Lab Roadmap Drawer
  */
 export default function CaseStudyModal() {
   const {
@@ -39,7 +39,6 @@ export default function CaseStudyModal() {
 
   if (!activeCaseStudy && !shoktiModalOpen) return null;
 
-  // Render Shokti Product Roadmap Modal
   if (shoktiModalOpen) {
     return (
       <div
@@ -54,8 +53,8 @@ export default function CaseStudyModal() {
         <div className="case-study-sheet" style={{ maxWidth: 780 }}>
           <div
             style={{
-              padding: '22px 28px',
-              borderBottom: '1px solid var(--border-seam)',
+              padding: '20px 26px',
+              borderBottom: 'var(--hairline) solid var(--border-seam)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -63,7 +62,9 @@ export default function CaseStudyModal() {
           >
             <div className="lab-badge" style={{ marginBottom: 0 }}>
               <span className="status-dot cyan" />
-              <span>SHOKTI (শক্তি) · PRODUCT ROADMAP</span>
+              <span>
+                SHOKTI (<span lang="bn">{SHOKTI_LAB.nameBangla}</span>) · ROADMAP
+              </span>
             </div>
             <button
               type="button"
@@ -79,9 +80,11 @@ export default function CaseStudyModal() {
             <h2
               id="shokti-modal-title"
               className="display-section"
-              style={{ fontSize: 'clamp(26px, 3vw, 36px)', marginBottom: 10 }}
+              style={{ marginBottom: 10 }}
             >
-              {SHOKTI_LAB.name} — Progressive Overload Architecture
+              {SHOKTI_LAB.namePrefix}
+              <span lang="bn">{SHOKTI_LAB.nameBangla}</span>
+              {SHOKTI_LAB.nameSuffix} — Progressive Overload Architecture
             </h2>
             <p className="lead-copy" style={{ marginBottom: 28 }}>
               {SHOKTI_LAB.narrative}
@@ -93,8 +96,8 @@ export default function CaseStudyModal() {
                   key={milestone.phase}
                   style={{
                     padding: 20,
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-seam)',
+                    borderRadius: 'var(--radius-card)',
+                    border: 'var(--hairline) solid var(--border-seam)',
                     background: 'var(--bg-canvas)',
                   }}
                 >
@@ -130,7 +133,7 @@ export default function CaseStudyModal() {
                           display: 'flex',
                           alignItems: 'flex-start',
                           gap: 9,
-                          fontSize: 14,
+                          fontSize: 14.5,
                           color: 'var(--text-secondary)',
                         }}
                       >
@@ -138,7 +141,7 @@ export default function CaseStudyModal() {
                           size={15}
                           style={{
                             color: 'var(--accent-emerald)',
-                            marginTop: 3,
+                            marginTop: 4,
                             flexShrink: 0,
                           }}
                         />
@@ -155,10 +158,17 @@ export default function CaseStudyModal() {
     );
   }
 
-  // Render Full 7-Block Deep-Dive Case Study
   const currentIdx = PROJECTS.findIndex((p) => p.id === activeCaseStudy.id);
   const nextProject = PROJECTS[(currentIdx + 1) % PROJECTS.length];
   const cs = activeCaseStudy.caseStudy;
+
+  const creativeWorkSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: activeCaseStudy.title,
+    author: { '@type': 'Person', name: 'Koushik Ahmed' },
+    description: cs.thesis,
+  };
 
   return (
     <div
@@ -170,23 +180,26 @@ export default function CaseStudyModal() {
         if (e.target === e.currentTarget) setActiveCaseStudy(null);
       }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(creativeWorkSchema) }}
+      />
       <article
         className="case-study-sheet"
-        data-xray-module={`CASE_STUDY_VIEW · ${activeCaseStudy.id.toUpperCase()}`}
+        data-xray-module={`CASE_STUDY_ROUTE · /WORK/${activeCaseStudy.id.toUpperCase()}`}
       >
-        {/* Top Sticky Header */}
         <div
           style={{
-            padding: '18px 28px',
-            borderBottom: '1px solid var(--border-seam)',
+            padding: '16px 26px',
+            borderBottom: 'var(--hairline) solid var(--border-seam)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             gap: 12,
           }}
         >
-          <span className="mono-tag" style={{ color: 'var(--accent-rose)' }}>
-            CASE STUDY {activeCaseStudy.index} // {activeCaseStudy.shortName}
+          <span className="mono-tag" style={{ color: 'var(--accent-text)' }}>
+            /work/{activeCaseStudy.id} · {activeCaseStudy.badge}
           </span>
           <button
             type="button"
@@ -199,9 +212,9 @@ export default function CaseStudyModal() {
           </button>
         </div>
 
-        <div style={{ padding: 'clamp(24px, 4vw, 44px)' }}>
-          {/* Block 1: Case Study Hero */}
-          <header style={{ marginBottom: 32 }}>
+        <div style={{ padding: 'clamp(22px, 4vw, 44px)' }}>
+          {/* Block 1: Hero */}
+          <header style={{ marginBottom: 30 }}>
             <h2
               id="case-study-modal-title"
               className="display-section"
@@ -229,80 +242,79 @@ export default function CaseStudyModal() {
                 className="btn-secondary"
               >
                 <GitBranch size={15} />
-                <span>GitHub Repository</span>
+                <span>GitHub</span>
               </a>
             </div>
           </header>
 
-          {/* Block 2: 4-Column Monospace Metadata Strip */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-              gap: 16,
-              padding: '18px 22px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-canvas)',
-              border: '1px solid var(--border-seam)',
-              marginBottom: 34,
-            }}
-          >
+          {/* Block 2: Container-Query Metadata Strip (4 cols -> 2x2) */}
+          <div className="cs-metadata-grid">
             <div>
               <div className="telemetry-strip-label">ROLE</div>
-              <div style={{ fontSize: 13.5, fontWeight: 500, marginTop: 4 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, marginTop: 4 }}>
                 {cs.metadata.role}
               </div>
             </div>
             <div>
               <div className="telemetry-strip-label">TIMELINE</div>
-              <div style={{ fontSize: 13.5, fontWeight: 500, marginTop: 4 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, marginTop: 4 }}>
                 {cs.metadata.timeline}
               </div>
             </div>
             <div>
-              <div className="telemetry-strip-label">CORE STACK</div>
-              <div style={{ fontSize: 13.5, fontWeight: 500, marginTop: 4 }}>
+              <div className="telemetry-strip-label">STACK</div>
+              <div style={{ fontSize: 14, fontWeight: 500, marginTop: 4 }}>
                 {cs.metadata.coreStack}
               </div>
             </div>
             <div>
               <div className="telemetry-strip-label">DEPLOYMENT</div>
-              <div style={{ fontSize: 13.5, fontWeight: 500, marginTop: 4 }}>
+              <div style={{ fontSize: 14, fontWeight: 500, marginTop: 4 }}>
                 {cs.metadata.deployment}
               </div>
             </div>
           </div>
 
-          {/* Block 6 / Hero Visual Frame */}
+          {/* Block 6: Device Showcase Frame */}
           <div
             style={{
-              borderRadius: 'var(--radius-lg)',
+              borderRadius: 'var(--radius-card)',
               overflow: 'hidden',
-              border: '1px solid var(--border-seam)',
-              marginBottom: 36,
+              border: 'var(--hairline) solid var(--border-seam)',
+              marginBottom: 34,
               background: '#09090b',
             }}
           >
-            <img
-              src={activeCaseStudy.image}
-              alt={`${activeCaseStudy.title} full showcase`}
-              style={{ width: '100%', maxHeight: 460, objectFit: 'cover' }}
-            />
+            <picture>
+              <source
+                type="image/webp"
+                srcSet={`${activeCaseStudy.imageWebpSm} 640w, ${activeCaseStudy.imageWebp} 1280w`}
+                sizes="(max-width: 767px) 94vw, 960px"
+              />
+              <img
+                src={activeCaseStudy.image}
+                alt={`${activeCaseStudy.title} full showcase`}
+                width="1280"
+                height="720"
+                style={{ width: '100%', maxHeight: 460, objectFit: 'cover' }}
+              />
+            </picture>
           </div>
 
-          {/* Block 3: The Problem & Context */}
-          <section style={{ marginBottom: 36 }}>
+          {/* Block 3: Problem & Context */}
+          <section style={{ marginBottom: 34 }}>
             <div className="eyebrow-telemetry">
               <span className="index-code">// 01</span>
-              <span>THE PROBLEM &amp; CONTEXT</span>
+              <span>PROBLEM &amp; CONTEXT</span>
             </div>
             {cs.problem.map((para) => (
               <p
                 key={para.slice(0, 24)}
                 style={{
                   color: 'var(--text-secondary)',
-                  fontSize: 15.5,
-                  lineHeight: 1.7,
+                  fontSize: 16,
+                  lineHeight: 1.68,
+                  maxWidth: '65ch',
                   marginBottom: 14,
                 }}
               >
@@ -311,44 +323,36 @@ export default function CaseStudyModal() {
             ))}
           </section>
 
-          {/* Block 4: System Architecture Node Diagram */}
+          {/* Block 4: Architecture Diagram (Horizontal md+ / Vertical on Mobile) */}
           <section
-            style={{ marginBottom: 36 }}
+            style={{ marginBottom: 34 }}
             data-xray-module="ARCH_TOPOLOGY · DATA_FLOW_GRAPH"
           >
             <div className="eyebrow-telemetry">
               <span className="index-code">// 02</span>
-              <span>SYSTEM ARCHITECTURE &amp; DATA FLOW</span>
+              <span>SYSTEM ARCHITECTURE</span>
             </div>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-                gap: 12,
-                alignItems: 'stretch',
-              }}
-            >
+            <div className="cs-arch-flow">
               {cs.architectureNodes.map((node, idx) => (
                 <div
                   key={node.label}
                   style={{
                     padding: 16,
-                    borderRadius: 'var(--radius-md)',
+                    borderRadius: 'var(--radius-card)',
                     background: 'var(--bg-canvas)',
-                    border: '1px solid var(--border-seam)',
-                    position: 'relative',
+                    border: 'var(--hairline) solid var(--border-seam)',
                   }}
                 >
                   <div
                     className="mono-tag"
                     style={{ color: 'var(--accent-telemetry)', marginBottom: 6 }}
                   >
-                    NODE 0{idx + 1}
+                    0{idx + 1} →
                   </div>
-                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>
+                  <div style={{ fontWeight: 600, fontSize: 14.5, marginBottom: 4 }}>
                     {node.label}
                   </div>
-                  <div style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
                     {node.sub}
                   </div>
                 </div>
@@ -356,11 +360,11 @@ export default function CaseStudyModal() {
             </div>
           </section>
 
-          {/* Block 5: 3 Design & Engineering Highlights */}
-          <section style={{ marginBottom: 20 }}>
+          {/* Block 5: 3 Decision Highlights */}
+          <section style={{ marginBottom: 34 }}>
             <div className="eyebrow-telemetry">
               <span className="index-code">// 03</span>
-              <span>DESIGN &amp; ENGINEERING HIGHLIGHTS</span>
+              <span>ENGINEERING DECISIONS</span>
             </div>
             <div
               style={{
@@ -374,24 +378,45 @@ export default function CaseStudyModal() {
                   key={h.title}
                   style={{
                     padding: 20,
-                    borderRadius: 'var(--radius-md)',
+                    borderRadius: 'var(--radius-card)',
                     background: 'var(--bg-canvas)',
-                    border: '1px solid var(--border-seam)',
+                    border: 'var(--hairline) solid var(--border-seam)',
                   }}
                 >
-                  <h4 style={{ fontSize: 15.5, fontWeight: 700, marginBottom: 8 }}>
+                  <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>
                     {h.title}
                   </h4>
-                  <p style={{ fontSize: 13.5, color: 'var(--text-secondary)' }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
                     {h.detail}
                   </p>
                 </div>
               ))}
             </div>
           </section>
+
+          {/* Block 7: Honest Outcome / What I'd Do Next (New in v2 §7) */}
+          <section>
+            <div className="eyebrow-telemetry">
+              <span className="index-code">// 04</span>
+              <span>OUTCOME &amp; WHAT I&apos;D MEASURE NEXT</span>
+            </div>
+            <p
+              style={{
+                padding: 18,
+                borderRadius: 'var(--radius-card)',
+                background: 'var(--bg-canvas)',
+                border: 'var(--hairline) solid var(--border-seam)',
+                color: 'var(--text-secondary)',
+                fontSize: 15,
+                maxWidth: '65ch',
+              }}
+            >
+              {cs.outcomeNext}
+            </p>
+          </section>
         </div>
 
-        {/* Block 7: Next Project Magnetic Bar */}
+        {/* Block 8: Next Project Bar */}
         <button
           type="button"
           onClick={() => {
@@ -400,8 +425,8 @@ export default function CaseStudyModal() {
           }}
           style={{
             width: '100%',
-            padding: '24px 32px',
-            borderTop: '1px solid var(--border-seam)',
+            padding: '22px 28px',
+            borderTop: 'var(--hairline) solid var(--border-seam)',
             background: 'var(--bg-canvas)',
             display: 'flex',
             alignItems: 'center',
@@ -418,7 +443,7 @@ export default function CaseStudyModal() {
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 20,
-                fontWeight: 700,
+                fontWeight: 600,
                 marginTop: 4,
               }}
             >
@@ -426,7 +451,7 @@ export default function CaseStudyModal() {
             </div>
           </div>
           <span className="btn-secondary" style={{ pointerEvents: 'none' }}>
-            <span>Open Next</span>
+            <span>Next</span>
             <ArrowRight size={15} />
           </span>
         </button>

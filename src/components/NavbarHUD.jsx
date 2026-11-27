@@ -1,24 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  Command,
   Menu,
-  ScanLine,
-  Sun,
+  MessageCircle,
   Moon,
+  ScanLine,
+  Search,
+  Sun,
   Volume2,
   VolumeX,
   X,
 } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
-import { SITE_CONFIG } from '../config/siteConfig';
+import { SITE_CONFIG, buildWhatsAppUrl } from '../config/siteConfig';
 
 const NAV_ITEMS = [
-  { label: 'Work', href: '#work' },
-  { label: 'Lab', href: '#lab' },
-  { label: 'Stack', href: '#stack' },
-  { label: 'Services', href: '#services' },
-  { label: 'About', href: '#about' },
+  { label: 'Work', href: '#work', code: '03 / WORK', id: 'work' },
+  { label: 'Lab', href: '#lab', code: '03 / LAB', id: 'lab' },
+  { label: 'Stack', href: '#stack', code: '05 / STACK', id: 'stack' },
+  { label: 'Services', href: '#services', code: '06 / SERVICES', id: 'services' },
+  { label: 'About', href: '#about', code: '07 / ABOUT', id: 'about' },
 ];
+
+function detectApplePlatform() {
+  if (typeof navigator === 'undefined') return false;
+  return /Mac|iPhone|iPad|iPod/i.test(
+    navigator.platform || navigator.userAgent || ''
+  );
+}
 
 export default function NavbarHUD() {
   const {
@@ -34,9 +42,58 @@ export default function NavbarHUD() {
   } = usePortfolio();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hudHiddenMobile, setHudHiddenMobile] = useState(false);
+  const [activeSectionId, setActiveSectionId] = useState('');
+  const [isApple] = useState(detectApplePlatform);
+  const lastScrollY = useRef(0);
+
+  // Hide HUD on scroll down / reveal on scroll up (mobile) + track active section
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y > 120 && y > lastScrollY.current + 8) {
+        setHudHiddenMobile(true);
+      } else if (y < lastScrollY.current - 6 || y <= 80) {
+        setHudHiddenMobile(false);
+      }
+      lastScrollY.current = y;
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return undefined;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSectionId(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: '-35% 0px -50% 0px', threshold: 0.05 }
+    );
+
+    NAV_ITEMS.forEach((item) => {
+      const el = document.getElementById(item.id);
+      if (el) io.observe(el);
+    });
+
+    return () => io.disconnect();
+  }, []);
+
+  const activeMobileCode =
+    NAV_ITEMS.find((n) => n.id === activeSectionId)?.code || 'MENU';
 
   return (
-    <header className="hud-header" role="banner">
+    <header
+      className={`hud-header ${
+        hudHiddenMobile && !mobileMenuOpen ? 'hud-hidden-mobile' : ''
+      }`}
+      role="banner"
+    >
       <div className="container">
         <nav
           className="hud-bar"
@@ -55,16 +112,22 @@ export default function NavbarHUD() {
             />
           </a>
 
-          {/* Center: Clean Section Links */}
+          {/* Center: Clean Section Links with Active Underline */}
           <div className="hud-nav-links">
             {NAV_ITEMS.map((item) => (
-              <a key={item.href} href={item.href} className="hud-nav-link">
+              <a
+                key={item.href}
+                href={item.href}
+                className={`hud-nav-link ${
+                  activeSectionId === item.id ? 'active' : ''
+                }`}
+              >
                 {item.label}
               </a>
             ))}
           </div>
 
-          {/* Right: Dual-Lens Pill + X-RAY + ⌘K + Theme + Soundwave */}
+          {/* Right: Dual-Lens Pill + X-RAY (X key) + Platform-Aware ⌘K / Ctrl K + Sound + Mobile Menu */}
           <div className="hud-controls">
             <div
               className="lens-switcher"
@@ -78,7 +141,8 @@ export default function NavbarHUD() {
                 onClick={() => setLens('engineer')}
                 aria-pressed={lens === 'engineer'}
               >
-                Engineer
+                <span className="lens-label-full">Engineering</span>
+                <span className="lens-label-short">Eng</span>
               </button>
               <button
                 type="button"
@@ -87,7 +151,7 @@ export default function NavbarHUD() {
                 onClick={() => setLens('client')}
                 aria-pressed={lens === 'client'}
               >
-                Client
+                <span>Client</span>
               </button>
             </div>
 
@@ -97,7 +161,7 @@ export default function NavbarHUD() {
               className={`hud-pill-btn hide-sm ${xray ? 'xray-active' : ''}`}
               onClick={toggleXray}
               aria-pressed={xray}
-              title="Toggle X-Ray Architecture Mode (Ctrl/Cmd + X)"
+              title="Toggle X-Ray Architecture Mode (Press X)"
             >
               <ScanLine size={13} />
               <span>X-RAY</span>
@@ -106,12 +170,11 @@ export default function NavbarHUD() {
             <button
               type="button"
               id="cmdk-open-btn"
-              className="hud-pill-btn"
+              className="hud-pill-btn hide-sm"
               onClick={() => openPalette('commands')}
-              title="Open Command Palette & Terminal (Ctrl/Cmd + K)"
+              title="Open Command Palette (/ or Cmd/Ctrl + K)"
             >
-              <Command size={12} />
-              <span>K</span>
+              <span>{isApple ? '⌘K' : 'Ctrl K'}</span>
             </button>
 
             <button
@@ -124,11 +187,6 @@ export default function NavbarHUD() {
                   ? 'Switch to Daylight Paper Theme'
                   : 'Switch to Obsidian Telemetry Theme'
               }
-              title={
-                theme === 'obsidian'
-                  ? 'Daylight Paper Theme'
-                  : 'Obsidian Dark Theme'
-              }
             >
               {theme === 'obsidian' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
@@ -136,7 +194,9 @@ export default function NavbarHUD() {
             <button
               type="button"
               id="sound-toggle-btn"
-              className={`hud-icon-btn ${soundEnabled ? 'sound-on' : ''}`}
+              className={`hud-icon-btn hide-sm ${
+                soundEnabled ? 'sound-on' : ''
+              }`}
               onClick={toggleSound}
               aria-pressed={soundEnabled}
               aria-label={
@@ -144,40 +204,59 @@ export default function NavbarHUD() {
                   ? 'Mute tactile micro-audio'
                   : 'Enable tactile micro-audio'
               }
-              title={
-                soundEnabled
-                  ? 'Tactile Audio On (Click to Mute)'
-                  : 'Tactile Audio Muted (Click to Enable)'
-              }
             >
               {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
             </button>
 
             <button
               type="button"
-              className="hud-icon-btn hud-mobile-toggle"
-              onClick={() => setMobileMenuOpen((v) => !v)}
-              aria-label="Toggle Mobile Navigation"
+              className="hud-pill-btn hud-mobile-toggle"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open Menu"
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
+              <Menu size={14} />
+              <span>{activeMobileCode}</span>
             </button>
           </div>
         </nav>
+      </div>
 
-        {/* Compact Mobile Drawer */}
-        {mobileMenuOpen && (
+      {/* Full-Screen Mobile Menu Sheet (§3.5) */}
+      {mobileMenuOpen && (
+        <div
+          className="mobile-menu-sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site Navigation Menu"
+        >
           <div
             style={{
-              pointerEvents: 'auto',
-              marginTop: 8,
-              padding: 16,
-              borderRadius: 18,
-              background: 'var(--bg-surface-1)',
-              border: '1px solid var(--border-strong)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span className="hud-brand">
+              {SITE_CONFIG.monogram}
+              <span className="dot-crimson">.</span>
+            </span>
+            <button
+              type="button"
+              className="hud-icon-btn"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Close Menu"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <div
+            style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 10,
+              gap: 6,
+              margin: '24px 0',
             }}
           >
             {NAV_ITEMS.map((item) => (
@@ -186,15 +265,37 @@ export default function NavbarHUD() {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 style={{
-                  padding: '8px 10px',
+                  padding: '14px 4px',
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 26,
                   fontWeight: 600,
-                  borderBottom: '1px solid var(--border-subtle)',
+                  borderBottom: 'var(--hairline) solid var(--border-seam)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}
               >
-                {item.label}
+                <span>{item.label}</span>
+                <span className="mono-tag" style={{ color: 'var(--text-muted)' }}>
+                  {item.code.split(' ')[0]}
+                </span>
               </a>
             ))}
-            <div style={{ display: 'flex', gap: 8, paddingTop: 6 }}>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              <button
+                type="button"
+                className="hud-pill-btn"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openPalette('commands');
+                }}
+              >
+                <Search size={13} />
+                <span>Search / Commands</span>
+              </button>
               <button
                 type="button"
                 className={`hud-pill-btn ${xray ? 'xray-active' : ''}`}
@@ -204,22 +305,43 @@ export default function NavbarHUD() {
                 }}
               >
                 <ScanLine size={13} />
-                <span>X-RAY MODE</span>
+                <span>X-Ray</span>
               </button>
               <button
                 type="button"
                 className="hud-pill-btn"
-                onClick={() => {
-                  toggleTheme();
-                  setMobileMenuOpen(false);
-                }}
+                onClick={() => toggleTheme()}
               >
-                <span>{theme === 'obsidian' ? 'DAYLIGHT' : 'OBSIDIAN'}</span>
+                {theme === 'obsidian' ? <Sun size={13} /> : <Moon size={13} />}
+                <span>{theme === 'obsidian' ? 'Daylight' : 'Obsidian'}</span>
+              </button>
+              <button
+                type="button"
+                className="hud-pill-btn"
+                onClick={() => toggleSound()}
+              >
+                {soundEnabled ? <Volume2 size={13} /> : <VolumeX size={13} />}
+                <span>{soundEnabled ? 'Sound On' : 'Muted'}</span>
               </button>
             </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <a
+                href={buildWhatsAppUrl()}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-primary"
+              >
+                <MessageCircle size={16} />
+                <span>WhatsApp</span>
+              </a>
+              <a href={`mailto:${SITE_CONFIG.email}`} className="btn-secondary">
+                <span>Email</span>
+              </a>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 }

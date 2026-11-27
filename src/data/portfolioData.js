@@ -1,36 +1,43 @@
 /**
- * Complete Structured Portfolio Content & Relational Architecture Data
- * Grounded strictly in Koushik Ahmed's End-to-End Portfolio Blueprint.
+ * Complete Structured Portfolio Content & Relational Architecture Data — Blueprint v2.0
+ * Includes recruiter-proof honest framing, mobile (<480px) copy variants, and unified 4-step Scope Estimator.
  */
 
 export const HERO_COPY = {
-  eyebrow: '01 // KOUSHIK AHMED · DHAKA, BD (GMT+6) · AVAILABLE FOR WORK',
+  eyebrowDesktop: '01 // KOUSHIK AHMED · DHAKA, BD (GMT+6) · AVAILABLE FOR WORK',
+  eyebrowMobile: 'KOUSHIK AHMED · DHAKA · AVAILABLE',
   engineer: {
     headlinePrefix: 'Building web, mobile, and edge systems that feel ',
     headlineItalic: 'effortless',
     headlineSuffix: '.',
-    subheadline:
-      'Final-year Computer Science student and full-stack developer engineering fast React interfaces, cross-platform React Native apps, and Cloudflare-powered web products—from architecture to deployment.',
+    subheadlineDesktop:
+      'Final-year Computer Science student and full-stack developer building fast React interfaces, cross-platform React Native apps, and Cloudflare-deployed products, from architecture to deployment.',
+    subheadlineMobile:
+      'Full-stack developer building fast React interfaces, React Native apps, and Cloudflare-deployed products.',
     primaryCta: 'Explore Selected Work →',
     primaryTarget: '#work',
-    secondaryCta: 'Inspect Architecture (X-Ray)',
-    secondaryAction: 'xray',
+    secondaryCta: 'Download Résumé',
+    secondaryAction: 'resume',
+    tertiaryHint: 'Press X to inspect architecture',
   },
   client: {
-    headlinePrefix: 'High-craft websites and mobile apps built to turn visitors into ',
+    headlinePrefix: 'High-craft websites and apps that turn visitors into ',
     headlineItalic: 'clients',
     headlineSuffix: '.',
-    subheadline:
-      'I partner with ambitious businesses, gyms, brands, and founders in Dhaka and worldwide to design and launch custom websites, e-commerce platforms, and mobile apps that load fast and drive real inquiries.',
-    primaryCta: 'Estimate Your Project (60s) →',
+    subheadlineDesktop:
+      'I design and launch custom websites, online stores, and mobile apps for businesses in Dhaka and worldwide. They load fast and are built to bring in real inquiries.',
+    subheadlineMobile:
+      'Custom websites, stores, and apps for businesses in Dhaka and worldwide, built to load fast and bring in inquiries.',
+    primaryCta: 'Estimate Your Project · 60s →',
     primaryTarget: '#estimator',
     secondaryCta: 'Chat on WhatsApp',
     secondaryAction: 'whatsapp',
+    tertiaryHint: '',
   },
   telemetryStrip: [
     {
       label: 'CORE STACK',
-      value: 'React · React Native · Tailwind · Supabase · Cloudflare Edge',
+      value: 'React · React Native · Tailwind · Supabase · Cloudflare',
     },
     {
       label: 'DELIVERY',
@@ -38,7 +45,7 @@ export const HERO_COPY = {
     },
     {
       label: 'STATUS',
-      value: 'Open for Product Engineering Roles & Select Freelance Builds',
+      value: 'Open to product engineering roles & select freelance builds',
     },
   ],
 };
@@ -50,7 +57,7 @@ export const PILLARS = [
     xrayTag: 'PILLAR_01 · CDN_EDGE · <50ms TTFB',
     span: 'span-7',
     title: 'Instant-Load Architecture',
-    copy: 'Deployed globally on Cloudflare Pages, Vercel, and modern cloud infrastructure so every interaction feels instantaneous—whether a user is in Dhaka, London, or San Francisco.',
+    copy: "Deployed on Cloudflare's global edge, so pages load fast whether the visitor is in Dhaka, London, or San Francisco.",
   },
   {
     id: 'cross-platform',
@@ -58,7 +65,7 @@ export const PILLARS = [
     xrayTag: 'PILLAR_02 · REACT + EXPO · UNIFIED UI',
     span: 'span-5',
     title: 'Web & Mobile Fluency',
-    copy: 'Seamless execution across responsive web applications (React, Tailwind, Sass) and native-feeling mobile experiences (React Native & Expo), designed first in Figma.',
+    copy: 'Responsive web apps (React, Tailwind, Sass) and native-feeling mobile apps (React Native & Expo), designed first in Figma.',
   },
   {
     id: 'quality-systems',
@@ -66,7 +73,7 @@ export const PILLARS = [
     xrayTag: 'PILLAR_03 · PLAYWRIGHT + VITEST · CI',
     span: 'span-5',
     title: 'Engineered to Hold Up',
-    copy: 'Structured component systems, automated testing practices (Playwright, Vitest), clean version control on GitHub, and scalable Postgres/Supabase backends.',
+    copy: 'Structured component systems, automated tests (Playwright, Vitest), clean Git history, and Postgres/Supabase backends.',
   },
   {
     id: 'product-growth',
@@ -74,7 +81,7 @@ export const PILLARS = [
     xrayTag: 'PILLAR_04 · FUNNELS + LOCAL AI MEDIA',
     span: 'span-7',
     title: 'Beyond Just Code',
-    copy: 'Real-world commercial instinct—combining UI engineering with AI-assisted workflows, short-form media production, and conversion-focused lead funnels.',
+    copy: 'Commercial instinct: UI engineering combined with AI-assisted workflows, short-form media, and conversion-focused lead funnels.',
   },
 ];
 
@@ -84,128 +91,141 @@ export const PROJECTS = [
     index: '01',
     title: 'Fitness Factory — Digital Front Desk',
     shortName: 'Fitness Factory',
-    category: 'Custom Web Product · Local Business Modernization · Cloudflare Pages',
+    badge: 'CONCEPT PROTOTYPE · PITCHED', // Switch to 'CLIENT PROJECT · LIVE' once signed
+    category: 'Web Product · Local Business Modernisation · Cloudflare',
     timeline: 'September 2026 · Dhanmondi, Dhaka',
     stageMode: 'desktop',
+    imageWebp: '/images/fitness-factory.webp',
+    imageWebpSm: '/images/fitness-factory-640.webp',
     image: '/images/fitness-factory.jpg',
     xrayTag: 'WORK_01 · CF_PAGES · ZERO_BLOAT_SPA',
     engineerSummary:
-      'Engineered a custom, edge-deployed digital front desk web prototype for Fitness Factory (Dhanmondi, Dhaka) on Cloudflare Pages. Designed to replace friction-heavy manual inquiry handling with a fast, responsive, zero-bloat web interface built for instant mobile access.',
+      'Built an edge-deployed digital front desk prototype for Fitness Factory (Dhanmondi) on Cloudflare. It is designed to replace scattered manual inquiries with a fast, mobile-first interface for pricing, schedules, and instant contact.',
     clientSummary:
-      'Transformed how a premier Dhaka gym presents itself online—replacing scattered social media inquiries with a sleek, instant-loading Digital Front Desk built to convert local visitors into walk-ins and members.',
-    stack: ['React.js', 'Tailwind CSS', 'Cloudflare Pages', 'Responsive UI'],
+      'A concept I built and pitched to a Dhanmondi gym, showing how a fast, modern website could turn social-media browsers into walk-ins and members.',
+    stack: ['React', 'Tailwind CSS', 'Cloudflare', 'Responsive UI'],
     liveUrl: 'https://github.com/ahm3d777',
     liveLabel: 'Live Prototype',
     repoUrl: 'https://github.com/ahm3d777',
     caseStudy: {
       thesis:
-        'Replacing scattered Facebook/phone gym inquiries in Dhanmondi with a sub-second Cloudflare Edge Digital Front Desk.',
+        'A working Cloudflare-deployed concept prototype demonstrating how Dhanmondi gyms can convert mobile visitors into walk-in trial members.',
       metadata: {
-        role: 'Lead Product Designer & Frontend Engineer',
-        timeline: 'September 2026 (Rapid Prototype Sprint)',
-        coreStack: 'React.js · Tailwind CSS · Figma',
-        deployment: 'Cloudflare Pages Global Edge',
+        role: 'Product Design & Frontend Engineering (Concept Pitch)',
+        timeline: 'September 2026',
+        coreStack: 'React · Tailwind CSS · Figma',
+        deployment: 'Cloudflare Global Edge',
       },
       problem: [
-        'Local fitness centers in Dhaka often rely solely on social media DMs and static image flyers to handle membership questions, class schedules, and trial requests. Prospective members on mobile data face friction finding basic pricing, peak-hour schedules, or how to claim a walk-in trial pass.',
-        'Fitness Factory needed a modern, unmistakable digital front desk that works effortlessly on any smartphone in Dhanmondi—surfacing class schedules, floor readiness, membership clarity, and instant trial-pass registration in one cohesive experience.',
+        'Local fitness centres in Dhaka often rely solely on social media DMs and static flyers to answer basic pricing, peak-hour schedule, and trial-pass questions. Visitors on mobile data face friction before ever stepping through the door.',
+        'Rather than pitching a static slide deck, I designed and shipped a live Digital Front Desk concept tailored to Fitness Factory in Dhanmondi—putting schedules, membership clarity, and instant trial-pass requests within thumb reach.',
       ],
       architectureNodes: [
-        { label: 'Mobile / Desktop Visitor', sub: 'Dhaka 4G / Broadband' },
-        { label: 'Cloudflare Edge PoP', sub: 'Global Static & Edge Cache' },
-        { label: 'React Digital Front Desk', sub: 'Schedule & Tier Modules' },
-        { label: 'Instant Lead Handoff', sub: 'Trial Pass & WhatsApp CTA' },
+        { label: 'User Device', sub: '360px Android / Desktop' },
+        { label: 'Cloudflare Edge', sub: 'Sub-second Static Cache' },
+        { label: 'React Front Desk UI', sub: 'Schedule & Tier Modules' },
+        { label: 'Lead Capture', sub: 'Trial Pass & WhatsApp CTA' },
       ],
       highlights: [
         {
-          title: 'Zero-Friction Mobile Hierarchy',
+          title: 'Thumb-Zone Mobile Hierarchy',
           detail:
-            'Prioritized thumb-reachable trial pass booking and class schedule inspection so prospective gym members convert in under 30 seconds.',
+            'Problem: Buried phone numbers on legacy pages → Choice: Sticky trial-pass & class filter flow → Result: Sub-30-second mobile path to inquiry.',
         },
         {
-          title: 'Sub-Second Edge Delivery',
+          title: 'Lean Edge Asset Budget',
           detail:
-            'Shipped via Cloudflare Pages with lean asset payloads to guarantee crisp first paint even on congested local cellular networks.',
+            'Problem: Patchy Dhaka 4G connections → Choice: Zero-bloat React bundle on Cloudflare Pages → Result: Sub-second interactive paint.',
         },
         {
-          title: 'Commercial Pitch Prototype',
+          title: 'Live Product Pitch Strategy',
           detail:
-            'Built proactively as a tangible, working commercial product showcase rather than a static slide deck—proving immediate business value.',
+            'Problem: Cold pitches rarely stand out → Choice: Built a real working URL customized to the gym → Result: Immediate tangible proof during outreach.',
         },
       ],
+      outcomeNext:
+        'Post-signoff production metrics to instrument: trial-pass form completion rate from Instagram bio traffic, WhatsApp tap-through ratio on 360px Android viewports, and front-desk staff check-in time saved.',
     },
   },
   {
     id: 'chikara',
     index: '02',
-    title: 'Chikara — Cross-Platform Mobile Application',
+    title: 'Chikara — Cross-Platform Mobile App',
     shortName: 'Chikara App',
+    badge: 'LEAD DEVELOPER',
     category: 'Mobile Engineering · React Native & Expo',
     timeline: 'October 2025',
     stageMode: 'mobile',
+    imageWebp: '/images/chikara.webp',
+    imageWebpSm: '/images/chikara-640.webp',
     image: '/images/chikara.jpg',
     xrayTag: 'WORK_02 · REACT_NATIVE · EXPO_RUNTIME',
     engineerSummary:
-      'Architected and built a cross-platform mobile application using React Native and Expo, prioritizing responsive touch physics, modular navigation, and unified codebase maintainability across mobile devices.',
+      'Architected and built a cross-platform app in React Native and Expo, focused on responsive touch interactions, modular navigation, and a single maintainable codebase.',
     clientSummary:
-      'A smooth, native-feeling mobile app built from a single modern codebase—delivering fast performance and clean user journeys without paying twice for separate iOS and Android teams.',
-    stack: ['React Native', 'Expo', 'JavaScript (ES6+)', 'Mobile UX'],
+      'A smooth, native-feeling app from one modern codebase, so you get fast performance on iOS and Android without paying for two separate teams.',
+    stack: ['React Native', 'Expo', 'JavaScript', 'Mobile UX'],
     liveUrl: 'https://github.com/ahm3d777',
-    liveLabel: 'Demo & Repo',
+    liveLabel: 'GitHub / Demo Video',
     repoUrl: 'https://github.com/ahm3d777',
     caseStudy: {
       thesis:
         'Delivering tactile native mobile UX across iOS and Android from a unified, cleanly structured React Native & Expo architecture.',
       metadata: {
-        role: 'Mobile Application Engineer',
+        role: 'Lead Mobile Developer',
         timeline: 'October 2025',
         coreStack: 'React Native · Expo · JavaScript',
-        deployment: 'Expo OTA & Cross-Platform Builds',
+        deployment: 'Expo Cross-Platform Builds',
       },
       problem: [
-        'Cross-platform apps frequently suffer from web-like sluggishness when navigation hierarchies, touch feedback, and screen state transitions are treated as an afterthought.',
-        'Chikara was engineered to prove that a single JavaScript/React Native codebase paired with Expo can feel unmistakably native—combining fluid gesture drawers, structured progress cards, and predictable component modularity.',
+        'Cross-platform apps frequently feel sluggish when navigation hierarchies, touch feedback, and screen transitions are treated like desktop web pages.',
+        'Chikara was architected so a single React Native + Expo codebase feels native in hand—combining fluid gesture drawers, high-contrast progress rings, and modular screen routing.',
       ],
       architectureNodes: [
         { label: 'Touch & Gesture Layer', sub: '60fps Native Feel' },
-        { label: 'Modular Screen Router', sub: 'Tab + Stack Navigation' },
-        { label: 'Shared State & Hooks', sub: 'Predictable UI Updates' },
+        { label: 'Modular Router', sub: 'Tab + Stack Navigation' },
+        { label: 'Shared State Hooks', sub: 'Predictable UI Updates' },
         { label: 'Expo Build & OTA', sub: 'iOS & Android Parity' },
       ],
       highlights: [
         {
           title: 'Tactile Screen Choreography',
           detail:
-            'Designed bottom-sheet drawers, progress rings, and card interactions around natural thumb reach and crisp contrast.',
+            'Problem: Janky transitions on mid-range phones → Choice: Lightweight native-driver animations → Result: Smooth bottom-sheet and tab switches.',
         },
         {
-          title: 'Unified Codebase Economics',
+          title: 'Single Codebase Economics',
           detail:
-            'Shared 95%+ UI and business logic across mobile platforms while preserving platform-appropriate safe areas and typography.',
+            'Problem: Duplicate iOS/Android UI effort → Choice: Shared modular Expo component kit → Result: Unified parity with safe-area discipline.',
         },
         {
-          title: 'Rapid Iteration via Expo',
+          title: 'Rapid OTA Iteration',
           detail:
-            'Leveraged Expo tooling for fast device testing, clean asset bundling, and friction-free iteration cycles.',
+            'Problem: Slow mobile QA feedback loops → Choice: Expo preview builds → Result: Fast physical-device testing.',
         },
       ],
+      outcomeNext:
+        'Next engineering iteration: migrate shared state modules to strict TypeScript schemas and add offline SQLite caching for zero-signal sessions.',
     },
   },
   {
     id: 'elevatecv',
     index: '03',
-    title: 'ElevateCV — AI-Powered Resume Builder',
+    title: 'ElevateCV — AI-Powered Résumé Builder',
     shortName: 'ElevateCV',
-    category: 'Full-Stack Web App · Productivity & AI Utility',
+    badge: 'FULL-STACK WEB APP',
+    category: 'Full-Stack Web App · Productivity & AI',
     timeline: '2025',
     stageMode: 'workspace',
+    imageWebp: '/images/elevatecv.webp',
+    imageWebpSm: '/images/elevatecv-640.webp',
     image: '/images/elevatecv.jpg',
     xrayTag: 'WORK_03 · SPLIT_RENDER · ATS_ENGINE',
     engineerSummary:
-      'Designed and developed an AI-assisted resume builder featuring real-time split-screen preview rendering, ATS-friendly layout architecture, intelligent content suggestions, and multi-template state management.',
+      'An AI-assisted résumé builder with real-time split-pane preview, ATS-friendly layout architecture, content suggestions, and multi-template state management.',
     clientSummary:
-      'A fast, intuitive web application that turns raw career history into clean, recruiter-ready résumés in minutes—complete with live instant previews and smart writing assistance.',
-    stack: ['React.js', 'Tailwind CSS', 'Real-Time Preview', 'AI Integration'],
+      'A fast web app that turns raw career history into clean, recruiter-ready résumés in minutes, with live preview and writing assistance.',
+    stack: ['React', 'Tailwind CSS', 'Real-Time Preview', 'AI Integration'],
     liveUrl: 'https://github.com/ahm3d777',
     liveLabel: 'Live App',
     repoUrl: 'https://github.com/ahm3d777',
@@ -215,36 +235,38 @@ export const PROJECTS = [
       metadata: {
         role: 'Full-Stack Web Developer',
         timeline: '2025',
-        coreStack: 'React.js · Tailwind CSS · AI API',
+        coreStack: 'React · Tailwind CSS · AI API',
         deployment: 'Modern Cloud Web Hosting',
       },
       problem: [
-        'Job seekers waste hours fighting brittle Word templates that break formatting whenever a single line is added—or use flashy graphic builders that fail Applicant Tracking System (ATS) parsers.',
-        'ElevateCV separates structured career data from typographic presentation: users edit clean form sections with optional AI phrasing enhancements on the left while watching an ATS-compliant document update instantaneously on the right.',
+        'Job seekers lose hours fighting brittle document templates that break whenever a bullet is added—or use over-styled graphic templates that fail Applicant Tracking System (ATS) parsers.',
+        'ElevateCV decouples structured career state from presentation: users edit clean form sections with optional AI rewrite suggestions on the left while an ATS-clean document updates live on the right.',
       ],
       architectureNodes: [
-        { label: 'Structured Editor Pane', sub: 'Controlled React Forms' },
-        { label: 'AI Rewrite Assistant', sub: 'Impact & Verb Refinement' },
-        { label: 'Normalized Resume State', sub: 'Multi-Template Schema' },
-        { label: 'Live Print/PDF Canvas', sub: 'Deterministic ATS Layout' },
+        { label: 'Editor Form State', sub: 'Controlled React Inputs' },
+        { label: 'AI Rewrite Layer', sub: 'Impact & Verb Phrasing' },
+        { label: 'Normalized Schema', sub: 'Multi-Template State' },
+        { label: 'Print / PDF Canvas', sub: 'Deterministic ATS Output' },
       ],
       highlights: [
         {
-          title: 'Zero-Latency Split Preview',
+          title: 'Zero-Lag Split Preview',
           detail:
-            'Engineered reactive document state so every keystroke and template toggle reflects immediately without layout thrashing.',
+            'Problem: Preview flicker during typing → Choice: Normalized state updates → Result: Instantaneous document reflow.',
         },
         {
-          title: 'Action-Oriented AI Assistance',
+          title: 'Grounded AI Assistance',
           detail:
-            'Integrated contextual phrasing suggestions that strengthen engineering and business impact bullets without inventing fake fluff.',
+            'Problem: Generic AI buzzwords → Choice: Action-verb & metric-focused rewrite prompts → Result: Stronger, honest bullet points.',
         },
         {
-          title: 'Print-Exact ATS Typography',
+          title: 'Print-Exact ATS Layout',
           detail:
-            'Crafted clean semantic hierarchy and print media rules so exported PDFs parse cleanly across enterprise recruiting tools.',
+            'Problem: Broken page breaks on PDF export → Choice: Semantic print stylesheet rules → Result: Crisp, parser-friendly exports.',
         },
       ],
+      outcomeNext:
+        'Next engineering iteration: add side-by-side job-description keyword diffing and shareable read-only recruiter links backed by Supabase.',
     },
   },
   {
@@ -252,83 +274,90 @@ export const PROJECTS = [
     index: '04',
     title: 'Bangladesh Premium Jersey Store',
     shortName: 'BD Jersey Store',
-    category: 'E-Commerce Platform · Retail UI/UX',
+    badge: 'EDGE DEPLOYED · WRANGLER',
+    category: 'E-Commerce · Retail UI/UX',
     timeline: 'December 2025',
     stageMode: 'commerce',
+    imageWebp: '/images/jersey-store.webp',
+    imageWebpSm: '/images/jersey-store-640.webp',
     image: '/images/jersey-store.jpg',
-    xrayTag: 'WORK_04 · ECOMMERCE_UI · VARIANT_STATE',
+    xrayTag: 'WORK_04 · ECOMMERCE_UI · WRANGLER_EDGE',
     engineerSummary:
-      'Built a dedicated e-commerce storefront (bangladesh-premium-jersey-store) tailored to high-visual sports apparel, featuring responsive product catalogs, clean variant selection, and mobile-first checkout UX.',
+      'A mobile-first storefront for sports apparel with responsive catalogues, clean variant selection, and a streamlined checkout flow, deployed with Cloudflare Wrangler.',
     clientSummary:
-      'A high-impact online storefront built for the Bangladeshi retail market—making jerseys look unmistakably premium on mobile screens while keeping browsing and ordering effortless.',
-    stack: ['React.js', 'E-Commerce UI', 'Tailwind CSS', 'Mobile-First'],
+      'An online store built for the Bangladeshi market that makes jerseys look premium on mobile while keeping browsing and ordering effortless.',
+    stack: ['React', 'Tailwind CSS', 'E-Commerce UI', 'Mobile-First'],
     liveUrl: 'https://github.com/ahm3d777',
-    liveLabel: 'Live Storefront',
+    liveLabel: 'Live Store',
     repoUrl: 'https://github.com/ahm3d777',
     caseStudy: {
       thesis:
-        'Elevating Bangladeshi sports apparel retail with studio-dark product presentation, instant size selection, and frictionless mobile cart flows.',
+        'Elevating Bangladeshi sports apparel retail with studio-dark product presentation, instant size selection, and frictionless mobile checkout.',
       metadata: {
         role: 'Frontend & E-Commerce UI Engineer',
         timeline: 'December 2025',
-        coreStack: 'React.js · Tailwind CSS · JavaScript',
-        deployment: 'Edge Web Deployment',
+        coreStack: 'React · Tailwind CSS · Wrangler',
+        deployment: 'Cloudflare Edge via Wrangler',
       },
       problem: [
-        'Many local apparel shops in Bangladesh lose high-intent football fans to cluttered catalog grids, slow image carousels, and confusing multi-step checkout pages on mobile screens.',
-        'Bangladesh Premium Jersey Store treats every kit drop like a flagship sportswear release—pairing high-contrast imagery with one-tap S/M/L/XL variant selection, BDT pricing clarity, and an instant slide-over cart drawer.',
+        'Local apparel stores in Bangladesh frequently lose high-intent mobile shoppers from Facebook/Instagram links due to slow catalog grids and clunky multi-page checkouts.',
+        'Bangladesh Premium Jersey Store frames vibrant national and club kits on deep obsidian surfaces with 44px+ size selector pills, clear BDT pricing, and a slide-over cart drawer.',
       ],
       architectureNodes: [
-        { label: 'Catalog & Kit Filter', sub: 'Club & National Collections' },
-        { label: 'Variant State Matrix', sub: 'Size & Edition Selection' },
-        { label: 'Slide-Over Cart Drawer', sub: 'Optimistic BDT Totals' },
-        { label: 'Mobile Checkout Flow', sub: 'Fast Local Order Capture' },
+        { label: 'Mobile Storefront', sub: 'Club & National Catalogues' },
+        { label: 'Variant State Matrix', sub: 'S / M / L / XL Selection' },
+        { label: 'Slide-Over Cart', sub: 'Instant BDT Totals' },
+        { label: 'Cloudflare Wrangler', sub: 'Global Edge Delivery' },
       ],
       highlights: [
         {
           title: 'Merchandising-First Dark UI',
           detail:
-            'Framed vibrant national and club jersey colors against deep obsidian surfaces so stitching and crest details pop on OLED phones.',
+            'Problem: Flat template product cards → Choice: Studio-dark framing → Result: Kit crests and stitching pop on mobile OLED screens.',
         },
         {
-          title: 'Tactile Variant & Cart UX',
+          title: 'Zero-Reload Cart Drawer',
           detail:
-            'Eliminated full-page reloads when switching sizes or updating quantities inside the slide-over shopping drawer.',
+            'Problem: Page reloads on size/quantity edits → Choice: Optimistic client cart drawer → Result: Faster path from landing to checkout.',
         },
         {
-          title: 'Tailored for Local Retail',
+          title: 'Wrangler Edge Deployment',
           detail:
-            'Structured pricing, sizing, and mobile navigation specifically around how Bangladeshi shoppers browse from social links.',
+            'Problem: Slow regional TTFB → Choice: Deployed static assets via Cloudflare Wrangler → Result: Fast first paint across Bangladesh.',
         },
       ],
+      outcomeNext:
+        'Next engineering iteration: connect bKash/SSLCommerz payment webhook verification and real-time size inventory locking.',
     },
   },
 ];
 
 export const SHOKTI_LAB = {
-  name: 'Shokti (শক্তি)',
-  badge: 'IN DEVELOPMENT · LAB CONCEPT',
+  namePrefix: 'Shokti (',
+  nameBangla: 'শক্তি',
+  nameSuffix: ')',
+  badge: 'IN DEVELOPMENT',
   tagline:
-    'A React Native fitness & progressive overload app engineered specifically for Bangladeshi gym-goers.',
+    'A React Native progressive-overload training app built for Bangladeshi gym-goers.',
   narrative:
-    'Born directly out of training 4–5 days a week and finding existing global fitness apps bloated or disconnected from local gym routines. Shokti combines custom workout architecture, AI-guided training plans, and clean progressive overload tracking into a distraction-free mobile experience.',
+    'Born from training 4–5 days a week and finding global fitness apps bloated or disconnected from local gym routines. Shokti combines structured workout plans, AI-guided programming, and clean progressive-overload tracking in a distraction-free app.',
   roadmap: [
     {
       phase: 'Phase 01 · Core Set & Overload Engine',
       status: 'In Progress',
       items: [
-        'Zero-clutter set/rep/weight logger optimized for sweaty one-handed gym floor input (KG & LB toggle)',
+        'Zero-clutter set/rep/weight logger tuned for one-handed gym floor input (KG & LB toggle)',
         'Automatic previous-session ghost targets (+2.5kg / +1 rep progressive overload nudges)',
-        'Offline-first local persistence synced cleanly to Supabase Postgres when back on Wi-Fi/4G',
+        'Offline-first local persistence synced cleanly to Supabase Postgres when back online',
       ],
     },
     {
-      phase: 'Phase 02 · Local Gym Context & AI Split Coach',
+      phase: 'Phase 02 · Local Gym Context & AI Programming',
       status: 'Wireframed in Figma',
       items: [
-        'Equipment-aware routines tailored to real Dhaka gym floor setups (cables, dumbbells, Smith, barbell)',
-        'Bilingual (English + Bangla) cue cards and AI-assisted mesocycle adjustments',
-        '1RM e1RM trend telemetry without paywalled social feed bloat',
+        'Equipment-aware routines matched to real Dhaka gym setups (cables, dumbbells, Smith, barbell)',
+        'Bilingual (English + Bangla) cue cards and AI-guided mesocycle adjustments',
+        'Clean e1RM trend telemetry with zero paywalled social-feed clutter',
       ],
     },
     {
@@ -336,7 +365,7 @@ export const SHOKTI_LAB = {
       status: 'Planned Milestone',
       items: [
         'Expo EAS closed beta with 50 Dhaka lifters',
-        'Integration bridge with gym front-desk systems like Fitness Factory',
+        'Optional member bridge for modern gym front-desk portals',
       ],
     },
   ],
@@ -346,10 +375,10 @@ export const MEDIA_SYSTEMS = [
   {
     id: 'centria',
     client: 'Centria University of Applied Sciences',
-    location: 'Kokkola, Finland · PlastLab (Chemical Eng. & Environmental Tech)',
+    location: 'Kokkola, Finland · PlastLab / Chemical Eng. & Environmental Tech',
     tag: 'INTERNATIONAL · 4K → 9:16 AI PIPELINE',
     scope:
-      'High-precision 9:16 vertical introduction video production (4K source to broadcast-clean 1080×1920 Reels/TikTok delivery), strict brand typography & safe-area caption verification, backed by an automated local AI processing workflow (faster-whisper + FFmpeg).',
+      '9:16 introduction video (4K source → 1080×1920 delivery), brand typography and safe-area caption checks, backed by a local AI workflow (faster-whisper + FFmpeg).',
     reelMeta: {
       ratio: '1080×1920 · 60fps',
       pipeline: 'faster-whisper + FFmpeg',
@@ -363,10 +392,10 @@ export const MEDIA_SYSTEMS = [
     location: 'Hatirpool, Dhaka, Bangladesh',
     tag: 'DHAKA COMMERCIAL · GROWTH REELS + AI FLOW',
     scope:
-      'Bilingual (Bangla-English & English) short-form vertical Reels strategy, content calendar architecture, and AI-assisted video production using Google Flow (Gemini Omni 1.2 Flash) engineered to drive non-follower reach and direct WhatsApp client inquiries.',
+      'Bilingual Bangla–English Reels strategy, content calendar, and AI-assisted production with Google Flow, aimed at non-follower reach and direct WhatsApp inquiries.',
     reelMeta: {
       ratio: 'Bilingual EN / BN',
-      pipeline: 'Google Flow · Gemini Omni',
+      pipeline: 'Google Flow · AI Video',
       badge: 'WHATSAPP FUNNEL',
       captionSample: '“Certified document translation in Dhaka — tap to verify on WhatsApp.”',
     },
@@ -377,22 +406,23 @@ export const SYSTEMS_MATRIX = [
   {
     id: 'interface',
     layerName: 'Interface & Design',
-    filterKey: 'Interface & Design',
-    role: 'Design-to-code fidelity, responsive layouts, tactile micro-interactions, accessible UI systems',
+    filterKey: 'Frontend',
+    role: 'Design-to-code fidelity, responsive layouts, accessible UI systems',
     tools: [
-      { name: 'React.js', projects: ['fitness-factory', 'elevatecv', 'jersey-store'] },
+      { name: 'React', projects: ['fitness-factory', 'elevatecv', 'jersey-store'] },
+      { name: 'TypeScript', projects: ['elevatecv'] },
       { name: 'JavaScript (ES6+)', projects: ['fitness-factory', 'chikara', 'elevatecv', 'jersey-store'] },
       { name: 'Tailwind CSS', projects: ['fitness-factory', 'elevatecv', 'jersey-store'] },
-      { name: 'HTML5', projects: ['fitness-factory', 'elevatecv', 'jersey-store'] },
-      { name: 'CSS3 & Sass', projects: ['fitness-factory', 'elevatecv', 'jersey-store'] },
+      { name: 'HTML5 & CSS3', projects: ['fitness-factory', 'elevatecv', 'jersey-store'] },
+      { name: 'Sass', projects: ['fitness-factory'] },
       { name: 'Figma', projects: ['fitness-factory', 'chikara', 'elevatecv'] },
     ],
   },
   {
     id: 'mobile',
-    layerName: 'Mobile Engineering',
+    layerName: 'Mobile',
     filterKey: 'Mobile',
-    role: 'Cross-platform mobile architecture, gesture-driven navigation, rapid OTA iteration',
+    role: 'Cross-platform architecture, gesture navigation, OTA iteration',
     tools: [
       { name: 'React Native', projects: ['chikara'] },
       { name: 'Expo', projects: ['chikara'] },
@@ -402,24 +432,26 @@ export const SYSTEMS_MATRIX = [
     id: 'edge-cloud',
     layerName: 'Edge, Cloud & Backend',
     filterKey: 'Edge & Cloud',
-    role: 'Global edge deployment, Postgres/auth backends, CI/CD pipelines, containerized hosting',
+    role: 'Edge deployment, Postgres/auth backends, CI/CD',
     tools: [
-      { name: 'Cloudflare Pages & Wrangler', projects: ['fitness-factory'] },
-      { name: 'Vercel', projects: ['elevatecv', 'jersey-store'] },
+      { name: 'Cloudflare Workers/Pages & Wrangler', projects: ['fitness-factory', 'jersey-store'] },
+      { name: 'Vercel', projects: ['elevatecv'] },
       { name: 'Supabase', projects: ['elevatecv'] },
       { name: 'Railway & Render', projects: ['elevatecv'] },
-      { name: 'GitHub', projects: ['fitness-factory', 'chikara', 'elevatecv', 'jersey-store'] },
+      { name: 'Node.js', projects: ['elevatecv'] },
+      { name: 'Git / GitHub', projects: ['fitness-factory', 'chikara', 'elevatecv', 'jersey-store'] },
     ],
   },
   {
     id: 'quality-ai',
     layerName: 'Quality, Testing & AI',
-    filterKey: 'Quality & AI',
-    role: 'Automated end-to-end & unit testing, code quality enforcement, local AI media & dev workflows',
+    filterKey: 'AI & Media',
+    role: 'E2E and unit tests, code quality, AI media and dev workflows',
     tools: [
       { name: 'Playwright', projects: ['fitness-factory', 'jersey-store'] },
-      { name: 'Vitest & ESLint', projects: ['fitness-factory', 'elevatecv'] },
-      { name: 'Claude Code CLI', projects: ['fitness-factory', 'elevatecv'] },
+      { name: 'Vitest', projects: ['fitness-factory', 'elevatecv'] },
+      { name: 'ESLint', projects: ['fitness-factory', 'chikara', 'elevatecv', 'jersey-store'] },
+      { name: 'Claude Code', projects: ['fitness-factory', 'elevatecv'] },
       { name: 'Google Flow', projects: [] },
       { name: 'FFmpeg & faster-whisper', projects: [] },
     ],
@@ -428,88 +460,103 @@ export const SYSTEMS_MATRIX = [
 
 export const ENGAGEMENT_TRACKS = [
   {
+    id: 'business-web',
     code: 'TRACK 01',
-    title: 'High-Conversion Business Website',
+    title: 'Business Website',
     description:
-      'Custom-designed informational or lead-generation sites (gyms, law firms, clinics, consultancies) deployed on Cloudflare Pages for sub-second speed and mobile-first inquiry capture.',
+      'Lead-generation sites for law firms, clinics, gyms, and consultancies, edge-deployed and mobile-first.',
   },
   {
+    id: 'web-mvp',
     code: 'TRACK 02',
-    title: 'Custom Web Application & MVP',
+    title: 'Web App & MVP',
     description:
-      'Full-stack React + Supabase/Railway web apps, interactive dashboards, e-commerce storefronts, and AI-powered tools built to scale cleanly.',
+      'Full-stack React + Supabase apps, interactive dashboards, storefronts, and AI tools.',
   },
   {
+    id: 'mobile',
     code: 'TRACK 03',
     title: 'Cross-Platform Mobile App',
     description:
-      'End-to-end React Native & Expo applications for iOS and Android with smooth gesture UX, clean state architecture, and rapid iteration.',
+      'React Native & Expo applications for iOS and Android, built cleanly end to end.',
   },
   {
+    id: 'engineering-role',
     code: 'TRACK 04',
     title: 'Full-Time / Contract Engineer',
     description:
-      'Joining an international or local product team to ship high-craft frontend, mobile, and full-stack features with strong ownership.',
+      'Joining an engineering or product team to ship frontend, mobile, and full-stack features with ownership.',
   },
 ];
 
+/**
+ * Unified 4-Step 60-Second Scope Estimator (v2 §5 Section 06 Part C)
+ */
 export const ESTIMATOR_STEPS = {
   projectTypes: [
     {
       id: 'business-web',
       label: 'Business Website',
-      stack: 'React.js · Custom CSS / Tailwind · Cloudflare Pages Edge',
+      hint: 'Lead-gen site for gyms, clinics, firms & brands',
+      stack: 'React · Tailwind / Custom CSS · Cloudflare Pages Edge',
+      phases: 'Discovery & Copy → Responsive Build → Edge Launch',
       deliverables: [
-        'Mobile-first bespoke UI & conversion copy architecture',
-        'Sub-second Cloudflare Edge deployment + custom domain SSL',
-        'Direct WhatsApp & async inquiry lead capture integration',
+        'Mobile-first bespoke UI & conversion copy hierarchy',
+        'Sub-second Cloudflare Edge deployment + SSL',
+        'Direct WhatsApp & async inquiry capture',
       ],
     },
     {
       id: 'web-app',
-      label: 'Web App / SaaS MVP',
-      stack: 'React.js · Supabase (Postgres + Auth) · Cloudflare / Railway',
+      label: 'Web App / MVP',
+      hint: 'Dashboards, SaaS tools & custom workflows',
+      stack: 'React · Supabase (Postgres + Auth) · Cloudflare / Railway',
+      phases: 'Architecture & Schema → Core MVP Sprint → QA & Deploy',
       deliverables: [
-        'Interactive application architecture & database schema',
-        'Authentication, live state sync & responsive dashboard UI',
-        'Automated Vitest/Playwright smoke checks + production CI/CD',
+        'Application state architecture & Postgres schema',
+        'Authentication, live data views & responsive UI',
+        'Automated Vitest/Playwright smoke checks + CI/CD',
       ],
     },
     {
       id: 'mobile-app',
-      label: 'Mobile App (iOS & Android)',
+      label: 'Mobile App',
+      hint: 'iOS & Android from one React Native codebase',
       stack: 'React Native · Expo · Supabase Backend',
+      phases: 'Figma Flows → Cross-Platform Build → Device Beta & Release',
       deliverables: [
         'Unified iOS & Android codebase with native-feel navigation',
-        'Figma screen flows + Expo preview builds on your phone',
-        'Store-ready production build configuration & API sync',
+        'Expo preview builds testable directly on your phone',
+        'Production build setup & backend API sync',
       ],
     },
     {
-      id: 'prototype',
-      label: 'Interactive Prototype',
-      stack: 'Figma + Live Edge-Deployed React Prototype',
+      id: 'online-store',
+      label: 'Online Store',
+      hint: 'Mobile-first e-commerce & retail catalogue',
+      stack: 'React · Cloudflare Wrangler Edge · Streamlined Cart Flow',
+      phases: 'Catalogue UX → Variant & Cart Engine → Checkout Launch',
       deliverables: [
-        'Clickable, real-code live URL ready for investor or client demos',
-        'High-impact visual polish & core user journey validation',
-        'Clean handoff foundation ready to scale into full production',
+        'High-contrast product showcase & size/variant matrix',
+        'Zero-reload slide-over cart & mobile checkout UX',
+        'Fast edge delivery tuned for social ad traffic',
       ],
     },
   ],
   stages: [
-    { id: 'idea', label: 'Just an Idea', phaseNote: 'Includes Discovery & Figma Wireframing' },
-    { id: 'brand', label: 'Have Content / Brand', phaseNote: 'UI Direction + Full Build' },
-    { id: 'figma', label: 'Have Figma Designs', phaseNote: 'Direct Pixel-Accurate Engineering' },
-    { id: 'redesign', label: 'Redesigning Existing Site', phaseNote: 'UX Audit + Edge Modernization' },
-  ],
-  speeds: [
-    { id: 'sprint', label: 'Rapid 1–2 Week Sprint', cadence: '1–2 Weeks (Focused Sprint)' },
-    { id: 'standard', label: 'Standard 3–5 Weeks', cadence: '3–5 Weeks (Milestone Releases)' },
-    { id: 'flexible', label: 'Flexible Cadence', cadence: 'Iterative Phased Roadmap' },
+    { id: 'idea', label: 'Just an idea', phaseNote: 'Includes wireframe scoping' },
+    { id: 'brand', label: 'Have content/brand', phaseNote: 'UI design + engineering' },
+    { id: 'figma', label: 'Have Figma designs', phaseNote: 'Direct pixel-accurate build' },
+    { id: 'redesign', label: 'Redesigning an existing site', phaseNote: 'UX audit + modernisation' },
   ],
   goals: [
-    { id: 'leads', label: 'Generate Leads & WhatsApp Inquiries' },
-    { id: 'product', label: 'Launch a New Digital Product' },
-    { id: 'ecommerce', label: 'Drive E-Commerce & Retail Sales' },
+    { id: 'leads', label: 'More leads & WhatsApp inquiries' },
+    { id: 'product', label: 'Launch a product' },
+    { id: 'sales', label: 'Sell online' },
+  ],
+  speeds: [
+    { id: 'sprint', label: 'Rapid sprint (1–2 wks)', timelineRange: '1–2 Weeks (Focused Sprint)' },
+    { id: 'standard', label: 'Standard (3–5 wks)', timelineRange: '3–5 Weeks (Phased Milestones)' },
+    { id: 'flexible', label: 'Flexible', timelineRange: 'Flexible Iterative Roadmap' },
   ],
 };

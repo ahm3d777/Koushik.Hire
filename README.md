@@ -1,80 +1,48 @@
-# Koushik Ahmed — Personal Portfolio (`Obsidian Telemetry`)
+# Koushik Ahmed — Personal Portfolio (`Obsidian Telemetry 2.0`)
 
-Product-minded Full-Stack Web, Mobile & Edge Systems portfolio engineered from the **End-to-End Personal Portfolio Website Design Blueprint**.
+Product-minded Full-Stack Web, Mobile & Edge Systems portfolio engineered from **Blueprint v2.0**.
 
 ---
 
-## Signature Architecture & Features Included
+## Key v2.0 Architecture & Highlights
 
-1. **Dual-Lens Visitor Switcher (`Engineer` / `Client`)** — Instant kinetic text-scramble (`useScrambleText`) reframing headlines, project summaries, and CTAs for technical recruiters vs. freelance business clients.
-2. **Live X-Ray Architecture Mode (`Cmd/Ctrl + X` or `X-RAY` HUD Switch)** — Cyan laser scanline sweep, wireframe module inspection callouts, live Three.js CAD wireframe toggle, and bottom-left real-time FPS / Viewport / Scroll / Edge PoP HUD.
-3. **3D Spatial Device Forge (`Three.js` WebGL Stage)** — Interactive Obsidian Monolith in the Hero (drag-to-orbit + cursor tilt) that morphs across project mediums (*Desktop*, *Mobile*, *Split Workspace*, *Commerce*) as you scroll through Selected Work, with automatic off-screen/hidden-tab pause guardrails.
-4. **Global Command Palette & Interactive Terminal (`Cmd/Ctrl + K`)** — Linear/Raycast-inspired spotlight launcher + `>_ Terminal` shell supporting `help`, `whoami`, `projects`, `stack`, `dhaka`, `setup`, `hire`, `xray`, `theme`, `gym`, `shokti`, and `clear`.
-5. **Live Dhaka Pulse Edge Telemetry Capsule** — Real-time `Asia/Dhaka` (`GMT+6`) clock + Cloudflare Pages Edge Function (`/functions/api/telemetry.js`) measuring live visitor PoP & round-trip latency.
-6. **Interactive Before / After Prototype Lab + 60-Second Scope Estimator** — Drag-handle modernization diff slider + 4-step configurator outputting a tailored project roadmap with 1-click **WhatsApp** and **Email** brief handoff.
-7. **Opt-In Tactile Micro-Audio & Daylight Paper Theme** — Procedural Web Audio synthesizer (muted by default) + warm-stone **Daylight Paper** light theme toggle.
+1. **Zero-CLS Dual-Lens Switcher + URL Routing (`?lens=client` / `?lens=engineer`)** — Stacks both variants in a single grid cell (`CLS = 0`), persists to `localStorage`, and supports shareable pitch links like `/?lens=client` or `/work/fitness-factory?lens=client`.
+2. **X-Ray Architecture Mode (Single-Key `X` · HUD Switch · `⌘K`)** — Never hijacks OS `Cmd/Ctrl + X` (Cut). Sweeps a 350ms cyan scanline, reveals section/module wireframes, switches the 3D stage to CAD wireframe, and displays live FPS, viewport, scroll %, and honest `cf.colo` Edge RTT.
+3. **Capability-Gated 3D Spatial Device Forge (`Three.js`)** — Lazy-loaded in its own async chunk; serves a `17 KB` `4:5` WebP poster by default on mobile `<768px` and Save-Data connections (with an optional `Load 3D Stage` tap), caps cursor tilt to `8°`, and pauses off-screen.
+4. **WCAG AA Contrast-Verified Tokens & Responsive System** — `#8B8B94` muted metadata (`5.9:1`), `#F43F5E` inline crimson text (`5.4:1`), machined `1px` top chamfers, `Clash Display` + `Inter` + `JetBrains Mono` + `Instrument Serif` + `Noto Sans Bengali` (`lang="bn"` for `শক্তি`), height-aware Work pinning (`≥1280px` & `≥720px` height), mobile Matrix accordion, `<480px` Before/After segmented toggle, and mobile stepped Estimator wizard.
+5. **Command Palette (`⌘K` / `Ctrl K` / `/`) + Touch-Friendly Terminal** — Centered spotlight on desktop, `85dvh` bottom sheet on phones, includes a manual **Reduce motion** toggle and tappable CLI command chips.
 
 ---
 
 ## Quick Start (Local Development)
 
-### Prerequisites
-- **Node.js 20+** (Node 22 LTS recommended) and **npm**
-
-### 1. Install Dependencies
 ```bash
 npm install
-```
-
-### 2. Start Local Dev Server
-```bash
 npm run dev
 ```
-Open `http://localhost:5173` in your browser. Vite includes a built-in local simulator for `/api/telemetry` and `/api/contact`.
 
-### 3. Run Automated Tests & Linter
+### Verification & Production Build
 ```bash
-npm run lint
-npm test
-```
-
-### 4. Production Build
-```bash
-npm run build
-npm run preview
+npm run lint      # ESLint (0 errors, 0 warnings)
+npm test          # Vitest v2 verification suite
+npm run build     # Code-split production bundle -> dist/
+npm run preview   # Preview production build
 ```
 
 ---
 
-## Where to Customize Your Links & Assets (60-Second Checklist)
+## Personalization Checklist (`60 Seconds`)
 
-1. **Contact, WhatsApp, Social & Resume Links (`src/config/siteConfig.js`)**:
-   - Update `whatsappNumber` (digits only, e.g. `'88017XXXXXXXX'`).
-   - Update `linkedinUrl` with your LinkedIn profile URL.
-   - Drop your PDF résumé at `public/resume.pdf` and set `resumeUrl: '/resume.pdf'` (a print-ready HTML résumé is pre-bundled at `/resume.html` so nothing ever 404s).
-2. **Project Live Demo & Repo URLs (`src/data/portfolioData.js`)**:
-   - Update `liveUrl` and `repoUrl` inside `PROJECTS` for *Fitness Factory*, *Chikara*, *ElevateCV*, and *Bangladesh Premium Jersey Store*.
-3. **Screenshots & Editorial Portrait (`public/images/`)**:
-   - Replace `public/images/portrait.jpg` with your studio portrait photo.
-   - Replace `fitness-factory.jpg`, `chikara.jpg`, `elevatecv.jpg`, and `jersey-store.jpg` with your own high-resolution screen captures whenever ready.
+1. **[src/config/siteConfig.js](./src/config/siteConfig.js)** — Set `whatsappNumber` (digits only, e.g. `'88017XXXXXXXX'`), `linkedinUrl`, `resumeUrl` (`/resume.html` included; drop a PDF at `public/resume.pdf` anytime), and optional `turnstileSiteKey`.
+2. **[src/data/portfolioData.js](./src/data/portfolioData.js)** — Update `liveUrl` and `repoUrl` on each entry in `PROJECTS` (and flip Fitness Factory's `badge` from `'CONCEPT PROTOTYPE · PITCHED'` to `'CLIENT PROJECT · LIVE'` if signed).
+3. **`public/images/`** — Replace `portrait.webp` / `portrait.jpg` and project `.webp` / `.jpg` captures with your own assets whenever ready.
 
 ---
 
-## Deploying to Cloudflare Pages (Recommended)
+## Deploying to Cloudflare Pages
 
-This repository includes native **Cloudflare Pages Functions** in `functions/api/telemetry.js` and `functions/api/contact.js` plus `wrangler.toml`.
+Includes native Cloudflare Pages Functions in `functions/api/edge.js`, `functions/api/telemetry.js`, and `functions/api/contact.js`, plus SPA deep-link routing in `public/_redirects` and `wrangler.toml`.
 
-### Option A: GitHub Auto-Deploy (Zero-Config)
-1. Push this folder to a new GitHub repository (`github.com/ahm3d777/portfolio`).
-2. In **Cloudflare Dashboard → Compute (Workers & Pages) → Create → Pages → Connect to Git**, select the repository.
-3. Set Build Configuration:
-   - **Framework preset:** `Vite`
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-4. *(Optional)* To forward async contact form briefs straight to your email or Discord, add `RESEND_API_KEY` or `DISCORD_WEBHOOK_URL` under **Settings → Environment Variables**.
-
-### Option B: Direct CLI Deploy via Wrangler
-```bash
-npm run build
-npx wrangler pages deploy dist --project-name koushik-ahmed-portfolio
-```
+- **GitHub Auto-Deploy:** Connect repo in Cloudflare Pages → Build command: `npm run build` → Output directory: `dist`.
+- **CLI Deploy:** `npm run build && npx wrangler pages deploy dist --project-name koushik-ahmed-portfolio`
+- **Optional Contact Alerts:** Add `DISCORD_WEBHOOK_URL` or `RESEND_API_KEY` in Cloudflare Pages Environment Variables.

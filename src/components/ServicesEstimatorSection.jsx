@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+  ArrowLeft,
   Check,
   Copy,
   Mail,
@@ -9,27 +10,94 @@ import {
 } from 'lucide-react';
 import { ENGAGEMENT_TRACKS, ESTIMATOR_STEPS } from '../data/portfolioData';
 import { SITE_CONFIG, buildWhatsAppUrl } from '../config/siteConfig';
+import { usePortfolio } from '../context/PortfolioContext';
 import { handleSpecularMouseMove } from '../utils/scrambleText';
 import { soundEngine } from '../utils/soundEngine';
 
+function loadSavedEstimatorState() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage?.getItem('ka_estimator_v2');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ServicesEstimatorSection() {
-  // Before / After Slider State (auto-nudges on first intersection)
+  const { lens, reducedMotion, announce } = usePortfolio();
+
+  // Part A: Before / After State (Slider on >=480px, Segmented Toggle on <480px)
   const [splitPct, setSplitPct] = useState(50);
+  const [mobilePane, setMobilePane] = useState('after'); // 'before' | 'after'
+  const [isNarrowPhone, setIsNarrowPhone] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 480 : false
+  );
   const baRef = useRef(null);
   const nudgedRef = useRef(false);
+  const draggingSliderRef = useRef(false);
 
-  // 60-Second Scope Estimator State
+  // Part C: Unified 4-Step Estimator State (Persisted to localStorage per §5 Section 06 Part C)
+  const saved = loadSavedEstimatorState();
   const [projectType, setProjectType] = useState(
-    ESTIMATOR_STEPS.projectTypes[0]
+    () =>
+      ESTIMATOR_STEPS.projectTypes.find((p) => p.id === saved?.typeId) ||
+      ESTIMATOR_STEPS.projectTypes[0]
   );
-  const [stage, setStage] = useState(ESTIMATOR_STEPS.stages[0]);
-  const [speed, setSpeed] = useState(ESTIMATOR_STEPS.speeds[1]);
-  const [goal, setGoal] = useState(ESTIMATOR_STEPS.goals[0]);
-  const [clientName, setClientName] = useState('');
-  const [briefNote, setBriefNote] = useState('');
+  const [stage, setStage] = useState(
+    () =>
+      ESTIMATOR_STEPS.stages.find((s) => s.id === saved?.stageId) ||
+      ESTIMATOR_STEPS.stages[0]
+  );
+  const [goal, setGoal] = useState(
+    () =>
+      ESTIMATOR_STEPS.goals.find((g) => g.id === saved?.goalId) ||
+      ESTIMATOR_STEPS.goals[0]
+  );
+  const [speed, setSpeed] = useState(
+    () =>
+      ESTIMATOR_STEPS.speeds.find((sp) => sp.id === saved?.speedId) ||
+      ESTIMATOR_STEPS.speeds[1]
+  );
+  const [clientName, setClientName] = useState(() => saved?.clientName || '');
+  const [briefNote, setBriefNote] = useState(() => saved?.briefNote || '');
+  const [mobileStep, setMobileStep] = useState(1); // 1..5 for <768px stepped wizard
+  const [isMobileWizard, setIsMobileWizard] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
   const [copiedBrief, setCopiedBrief] = useState(false);
 
   useEffect(() => {
+    const onResize = () => {
+      setIsNarrowPhone(window.innerWidth < 480);
+      setIsMobileWizard(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // Persist estimator state safely
+  useEffect(() => {
+    try {
+      window.localStorage?.setItem(
+        'ka_estimator_v2',
+        JSON.stringify({
+          typeId: projectType.id,
+          stageId: stage.id,
+          goalId: goal.id,
+          speedId: speed.id,
+          clientName,
+          briefNote,
+        })
+      );
+    } catch {
+      // Ignore storage quota errors
+    }
+  }, [projectType, stage, goal, speed, clientName, briefNote]);
+
+  // Auto-nudge 10% on first view (skipped when reduced motion is active)
+  useEffect(() => {
+    if (reducedMotion || isNarrowPhone) return undefined;
     const el = baRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') return undefined;
 
@@ -38,24 +106,61 @@ export default function ServicesEstimatorSection() {
         if (entries[0]?.isIntersecting && !nudgedRef.current) {
           nudgedRef.current = true;
           setTimeout(() => setSplitPct(60), 220);
-          setTimeout(() => setSplitPct(48), 580);
+          setTimeout(() => setSplitPct(50), 580);
         }
       },
       { threshold: 0.35 }
     );
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [reducedMotion, isNarrowPhone]);
+
+  // Pointer drag + keyboard ArrowLeft/ArrowRight (5%) for role="slider"
+  const updateSplitFromClientX = (clientX) => {
+    if (!baRef.current) return;
+    const rect = baRef.current.getBoundingClientRect();
+    const pct = ((clientX - rect.left) / rect.width) * 100;
+    setSplitPct(Math.max(8, Math.min(92, Math.round(pct))));
+  };
+
+  const handleSliderKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setSplitPct((p) => Math.max(8, p - 5));
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setSplitPct((p) => Math.min(92, p + 5));
+    }
+  };
+
+  // Part B: In Engineering lens, Track 4 moves first; in Client lens it moves last (§5 Section 06 Part B)
+  const orderedTracks =
+    lens === 'engineer'
+      ? [
+          ENGAGEMENT_TRACKS[3],
+          ENGAGEMENT_TRACKS[0],
+          ENGAGEMENT_TRACKS[1],
+          ENGAGEMENT_TRACKS[2],
+        ]
+      : ENGAGEMENT_TRACKS;
+
+  const advanceWizardAfterSelect = () => {
+    if (isMobileWizard) {
+      setTimeout(() => {
+        setMobileStep((s) => Math.min(5, s + 1));
+      }, 150);
+    }
+  };
 
   const generatedBriefText = [
-    `Hi Koushik! Here is my 60-Second Project Scope Summary:`,
+    `Hi Koushik! Here is my 60-Second Project Scope Brief:`,
     clientName ? `• Name: ${clientName}` : null,
     `• Building: ${projectType.label}`,
-    `• Current Stage: ${stage.label} (${stage.phaseNote})`,
-    `• Target Speed: ${speed.label}`,
-    `• Primary Goal: ${goal.label}`,
+    `• Starting From: ${stage.label} (${stage.phaseNote})`,
+    `• Main Goal: ${goal.label}`,
+    `• Timeline: ${speed.label}`,
     `• Recommended Stack: ${projectType.stack}`,
-    briefNote ? `• Extra Note: ${briefNote}` : null,
+    briefNote ? `• Note: ${briefNote}` : null,
   ]
     .filter(Boolean)
     .join('\n');
@@ -65,12 +170,11 @@ export default function ServicesEstimatorSection() {
   )}&body=${encodeURIComponent(generatedBriefText)}`;
 
   const handleCopyBrief = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(generatedBriefText).catch(() => {});
-    }
+    navigator.clipboard?.writeText(generatedBriefText).catch(() => {});
     soundEngine.playSuccess();
     setCopiedBrief(true);
-    setTimeout(() => setCopiedBrief(false), 2400);
+    announce('Project scope brief copied to clipboard');
+    setTimeout(() => setCopiedBrief(false), 1600);
   };
 
   return (
@@ -89,7 +193,7 @@ export default function ServicesEstimatorSection() {
           <em className="editorial-italic">launch</em>.
         </h2>
 
-        {/* Part A: Interactive Before / After Prototype Lab */}
+        {/* Part A: Before / After Prototype Lab */}
         <div style={{ marginTop: 32 }}>
           <div
             style={{
@@ -101,27 +205,76 @@ export default function ServicesEstimatorSection() {
             }}
           >
             <span className="mono-tag" style={{ color: 'var(--text-secondary)' }}>
-              PART A // INTERACTIVE BEFORE &amp; AFTER PROTOTYPE LAB
+              PART A // BEFORE &amp; AFTER PROTOTYPE LAB
             </span>
-            <span className="mono-tag" style={{ color: 'var(--accent-rose)' }}>
-              DRAG SLIDER ({splitPct}%)
-            </span>
+            {!isNarrowPhone && (
+              <span
+                className="mono-tag tabular-nums"
+                style={{ color: 'var(--accent-text)' }}
+              >
+                DRAG OR USE ←/→ KEYS ({splitPct}%)
+              </span>
+            )}
+          </div>
+
+          {/* Mobile (<480px) Segmented Before | After Toggle (§5 Section 06 Part A) */}
+          <div
+            className="lens-switcher ba-mobile-toggle-bar"
+            role="group"
+            aria-label="Before and After Comparison View"
+          >
+            <button
+              type="button"
+              className={`lens-btn ${mobilePane === 'before' ? 'active' : ''}`}
+              onClick={() => setMobilePane('before')}
+            >
+              Before
+            </button>
+            <button
+              type="button"
+              className={`lens-btn ${mobilePane === 'after' ? 'active' : ''}`}
+              onClick={() => setMobilePane('after')}
+            >
+              After
+            </button>
           </div>
 
           <div
             ref={baRef}
             className="ba-viewport"
-            style={{ marginTop: 14 }}
+            onPointerDown={(e) => {
+              if (isNarrowPhone) return;
+              draggingSliderRef.current = true;
+              updateSplitFromClientX(e.clientX);
+            }}
+            onPointerMove={(e) => {
+              if (!draggingSliderRef.current || isNarrowPhone) return;
+              updateSplitFromClientX(e.clientX);
+            }}
+            onPointerUp={() => {
+              draggingSliderRef.current = false;
+            }}
+            onPointerCancel={() => {
+              draggingSliderRef.current = false;
+            }}
             data-xray-module="PROTOTYPE_LAB · SPLIT_DIFF_VIEWPORT"
           >
-            {/* Full-Width Right Layer ("AFTER — Koushik's Edge Prototype") */}
-            <div className="ba-pane ba-pane-after">
+            {/* AFTER Pane */}
+            <div
+              className="ba-pane ba-pane-after"
+              style={{
+                opacity: isNarrowPhone && mobilePane === 'before' ? 0 : 1,
+                pointerEvents:
+                  isNarrowPhone && mobilePane === 'before' ? 'none' : 'auto',
+              }}
+            >
               <div
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  gap: 12,
+                  flexWrap: 'wrap',
+                  gap: 8,
                 }}
               >
                 <span
@@ -134,109 +287,106 @@ export default function ServicesEstimatorSection() {
                     border: '1px solid rgba(16,185,129,0.35)',
                   }}
                 >
-                  AFTER · KOUSHIK&apos;S EDGE FRONT DESK (0.38s LCP)
+                  AFTER · EDGE PROTOTYPE
                 </span>
                 <span className="mono-tag" style={{ color: '#a1a1aa' }}>
-                  CLOUDFLARE PAGES · DHANMONDI
+                  CLOUDFLARE · DHANMONDI
                 </span>
               </div>
 
-              <div style={{ maxWidth: 560, marginLeft: 'auto', textAlign: 'right' }}>
+              <div
+                style={{
+                  maxWidth: 540,
+                  marginLeft: isNarrowPhone ? 0 : 'auto',
+                  textAlign: isNarrowPhone ? 'left' : 'right',
+                }}
+              >
                 <div
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: 'clamp(22px, 2.8vw, 34px)',
-                    fontWeight: 700,
+                    fontSize: 'clamp(22px, 2.8vw, 32px)',
+                    fontWeight: 600,
                     lineHeight: 1.1,
                     marginBottom: 10,
                   }}
                 >
-                  Fitness Factory — Instant Trial Pass &amp; Live Floor Capacity
+                  Fitness Factory — Instant Trial Pass &amp; Class Schedule
                 </div>
-                <p style={{ fontSize: 14.5, color: '#a1a1aa', marginBottom: 18 }}>
-                  Clean mobile hierarchy, live class slots, transparent BDT
-                  tiers, and 1-tap WhatsApp / walk-in pass activation.
+                <p style={{ fontSize: 15, color: '#a1a1aa', marginBottom: 18 }}>
+                  Clean mobile hierarchy, live class slots, clear membership
+                  tiers, and one-tap WhatsApp or walk-in trial booking.
                 </p>
                 <div
                   style={{
                     display: 'inline-flex',
                     gap: 10,
                     flexWrap: 'wrap',
-                    justifyContent: 'flex-end',
+                    justifyContent: isNarrowPhone ? 'flex-start' : 'flex-end',
                   }}
                 >
                   <span
                     style={{
                       padding: '10px 18px',
-                      borderRadius: 999,
+                      borderRadius: 10,
                       background: '#e11d48',
                       color: '#fff',
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: 600,
                     }}
                   >
                     Claim 1-Day Trial Pass →
-                  </span>
-                  <span
-                    style={{
-                      padding: '10px 16px',
-                      borderRadius: 999,
-                      border: '1px solid #27272f',
-                      color: '#f4f4f6',
-                      fontSize: 13,
-                    }}
-                  >
-                    43 / 100 Floor Live
                   </span>
                 </div>
               </div>
 
               <div
                 className="mono-tag"
-                style={{ textAlign: 'right', color: '#71717a' }}
+                style={{
+                  textAlign: isNarrowPhone ? 'left' : 'right',
+                  color: '#8b8b94',
+                }}
               >
-                RESULT: CLEAR MOBILE FUNNEL · ZERO FRICTION
+                CLEAR MOBILE HIERARCHY · ONE-TAP INQUIRY
               </div>
             </div>
 
-            {/* Clipped Left Layer ("BEFORE — Typical Static Template") */}
+            {/* BEFORE Pane */}
             <div
               className="ba-pane ba-pane-before"
               style={{
-                clipPath: `inset(0 ${100 - splitPct}% 0 0)`,
+                clipPath: isNarrowPhone
+                  ? undefined
+                  : `inset(0 ${100 - splitPct}% 0 0)`,
+                opacity: isNarrowPhone && mobilePane === 'after' ? 0 : 1,
+                pointerEvents:
+                  isNarrowPhone && mobilePane === 'after' ? 'none' : 'auto',
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
+              <div>
                 <span
                   style={{
                     fontFamily: 'monospace',
-                    fontSize: 11,
+                    fontSize: 12,
                     padding: '4px 9px',
                     background: '#d4d4ce',
                     border: '1px solid #a1a19a',
-                    color: '#3f3f46',
+                    color: '#27272a',
                   }}
                 >
-                  BEFORE · GENERIC STATIC TEMPLATE (5.8s LOAD)
+                  BEFORE · GENERIC STATIC TEMPLATE
                 </span>
               </div>
 
-              <div style={{ maxWidth: 470 }}>
+              <div style={{ maxWidth: 460 }}>
                 <div
                   style={{
                     fontSize: 12,
                     textTransform: 'uppercase',
-                    color: '#71717a',
+                    color: '#52525b',
                     marginBottom: 6,
                   }}
                 >
-                  Home | About Us | Gallery 2018 | PDF Price List | Contact Us
+                  Home | About | Gallery 2018 | PDF Price List | Contact
                 </div>
                 <div
                   style={{
@@ -246,89 +396,94 @@ export default function ServicesEstimatorSection() {
                     marginBottom: 10,
                   }}
                 >
-                  WELCOME TO OUR FITNESS CENTER WEBSITE!!
+                  WELCOME TO OUR FITNESS CENTER WEBSITE
                 </div>
-                <p style={{ fontSize: 14, color: '#52525b', marginBottom: 14 }}>
-                  Unoptimized 8MB hero slider, broken mobile table spacing, no
-                  online class schedule, and a buried landline number at the
-                  bottom of a long page.
+                <p style={{ fontSize: 15, color: '#3f3f46', marginBottom: 14 }}>
+                  Heavy hero carousel, broken mobile spacing, no online
+                  schedule, and a buried phone number at the bottom of the page.
                 </p>
                 <span
                   style={{
                     display: 'inline-block',
-                    padding: '7px 12px',
+                    padding: '8px 12px',
                     background: '#a1a1aa',
                     color: '#18181b',
-                    fontSize: 12,
+                    fontSize: 13,
                   }}
                 >
                   Download Brochure.pdf (14.2 MB)
                 </span>
               </div>
 
-              <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#52525b' }}>
-                PROBLEM: VISITORS BOUNCE IN &lt;8 SECONDS ON MOBILE
+              <div
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                  color: '#3f3f46',
+                }}
+              >
+                SLOW LOAD · BURIED CONTACT DETAILS
               </div>
             </div>
 
-            {/* Drag Handle Line & Knob */}
+            {/* Accessible ARIA Slider Handle (sm+ >=480px) */}
             <div className="ba-divider-line" style={{ left: `${splitPct}%` }} />
-            <div className="ba-handle-knob" style={{ left: `${splitPct}%` }}>
+            <div
+              id="before-after-slider"
+              role="slider"
+              tabIndex={0}
+              aria-label="Before and After Prototype Comparison Slider"
+              aria-valuemin={8}
+              aria-valuemax={92}
+              aria-valuenow={splitPct}
+              onKeyDown={handleSliderKeyDown}
+              className="ba-handle-knob"
+              style={{ left: `${splitPct}%` }}
+            >
               <MoveHorizontal size={18} />
             </div>
-
-            <input
-              type="range"
-              id="before-after-slider"
-              className="ba-range-input"
-              min="8"
-              max="92"
-              value={splitPct}
-              aria-label="Compare Before Legacy Website and After Koushik Edge Prototype"
-              onChange={(e) => setSplitPct(Number(e.target.value))}
-            />
           </div>
         </div>
 
-        {/* Part B: Four Clear Engagement Tracks */}
+        {/* Part B: Four Engagement Tracks (Reordered dynamically by Lens) */}
         <div className="tracks-grid">
-          {ENGAGEMENT_TRACKS.map((track) => (
+          {orderedTracks.map((track) => (
             <div
-              key={track.code}
+              key={track.id}
               className="specular-card track-card"
               onMouseMove={handleSpecularMouseMove}
             >
-              <span className="mono-tag" style={{ color: 'var(--accent-rose)' }}>
+              <span className="mono-tag" style={{ color: 'var(--accent-text)' }}>
                 {track.code}
               </span>
               <h3
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 18.5,
-                  fontWeight: 700,
+                  fontSize: 19,
+                  fontWeight: 600,
                 }}
               >
                 {track.title}
               </h3>
-              <p style={{ fontSize: 13.5, color: 'var(--text-secondary)' }}>
+              <p style={{ fontSize: 14.5, color: 'var(--text-secondary)' }}>
                 {track.description}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Part C: The 60-Second Scope Estimator */}
+        {/* Part C: Unified 60-Second Scope Estimator (Desktop All-Steps / Mobile Wizard) */}
         <div
           id="estimator"
           className="specular-card estimator-shell"
           onMouseMove={handleSpecularMouseMove}
-          data-xray-module="ESTIMATOR_FSM · 4_STEP_CONFIGURATOR"
+          data-xray-module="ESTIMATOR_FSM · UNIFIED_4_STEP"
         >
           <div>
             <div
               className="mono-tag"
               style={{
-                color: 'var(--accent-rose)',
+                color: 'var(--accent-text)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
@@ -341,244 +496,353 @@ export default function ServicesEstimatorSection() {
             <h3
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(22px, 2.2vw, 28px)',
-                fontWeight: 700,
-                marginBottom: 22,
+                fontSize: 'var(--fs-h3)',
+                fontWeight: 600,
+                marginBottom: 18,
               }}
             >
-              Configure your build &amp; generate a ready-to-send brief.
+              Configure your scope &amp; generate a ready-to-send brief.
             </h3>
 
-            {/* Step 1 */}
-            <div className="estimator-step-group">
-              <span className="estimator-step-label">
-                01 · What are we building?
-              </span>
-              <div className="estimator-options-grid">
-                {ESTIMATOR_STEPS.projectTypes.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    id={`est-type-${opt.id}`}
-                    className={`estimator-opt-btn ${
-                      projectType.id === opt.id ? 'selected' : ''
-                    }`}
-                    onClick={() => {
-                      soundEngine.playClick(600, 0.025);
-                      setProjectType(opt);
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="estimator-step-group">
-              <span className="estimator-step-label">
-                02 · Current design readiness
-              </span>
-              <div className="estimator-options-grid">
-                {ESTIMATOR_STEPS.stages.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    className={`estimator-opt-btn ${
-                      stage.id === opt.id ? 'selected' : ''
-                    }`}
-                    onClick={() => {
-                      soundEngine.playClick(600, 0.025);
-                      setStage(opt);
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="estimator-step-group">
-              <span className="estimator-step-label">03 · Target timeline</span>
+            {/* Mobile Wizard Progress Header */}
+            {isMobileWizard && (
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                  gap: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 16,
+                  paddingBottom: 12,
+                  borderBottom: 'var(--hairline) solid var(--border-seam)',
                 }}
               >
-                {ESTIMATOR_STEPS.speeds.map((opt) => (
+                {mobileStep > 1 ? (
                   <button
-                    key={opt.id}
                     type="button"
-                    className={`estimator-opt-btn ${
-                      speed.id === opt.id ? 'selected' : ''
-                    }`}
-                    onClick={() => {
-                      soundEngine.playClick(600, 0.025);
-                      setSpeed(opt);
-                    }}
+                    className="hud-pill-btn"
+                    onClick={() => setMobileStep((s) => Math.max(1, s - 1))}
                   >
-                    {opt.label}
+                    <ArrowLeft size={13} />
+                    <span>Back</span>
                   </button>
-                ))}
+                ) : (
+                  <span className="mono-tag" style={{ color: 'var(--text-muted)' }}>
+                    TAP AN OPTION
+                  </span>
+                )}
+                <span className="mono-tag tabular-nums">
+                  STEP {Math.min(mobileStep, 4)} / 4
+                </span>
               </div>
-            </div>
+            )}
 
-            {/* Step 4 */}
-            <div className="estimator-step-group" style={{ marginBottom: 0 }}>
-              <span className="estimator-step-label">
-                04 · Primary outcome &amp; optional note
-              </span>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
-                  gap: 10,
-                  marginBottom: 12,
-                }}
-              >
-                {ESTIMATOR_STEPS.goals.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    className={`estimator-opt-btn ${
-                      goal.id === opt.id ? 'selected' : ''
-                    }`}
-                    onClick={() => {
-                      soundEngine.playClick(600, 0.025);
-                      setGoal(opt);
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+            {/* Step 1: What are we building? */}
+            {(!isMobileWizard || mobileStep === 1) && (
+              <div className="estimator-step-group">
+                <span className="estimator-step-label">
+                  1 · What are we building?
+                </span>
+                <div className="estimator-options-grid">
+                  {ESTIMATOR_STEPS.projectTypes.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      id={`est-type-${opt.id}`}
+                      className={`estimator-opt-btn ${
+                        projectType.id === opt.id ? 'selected' : ''
+                      }`}
+                      onClick={() => {
+                        soundEngine.playClick(600, 0.025);
+                        setProjectType(opt);
+                        advanceWizardAfterSelect();
+                      }}
+                    >
+                      <span>{opt.label}</span>
+                      <span
+                        style={{
+                          fontSize: 12.5,
+                          color: 'var(--text-muted)',
+                          fontWeight: 400,
+                        }}
+                      >
+                        {opt.hint}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: 10,
-                }}
-              >
-                <input
-                  type="text"
-                  className="input-field"
-                  placeholder="Your Name / Brand (optional)"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                />
-                <input
-                  type="text"
-                  className="input-field"
-                  placeholder="1-line context (e.g. Dhaka clinic booking)"
-                  value={briefNote}
-                  onChange={(e) => setBriefNote(e.target.value)}
-                />
+            )}
+
+            {/* Step 2: Where are you starting? */}
+            {(!isMobileWizard || mobileStep === 2) && (
+              <div className="estimator-step-group">
+                <span className="estimator-step-label">
+                  2 · Where are you starting?
+                </span>
+                <div className="estimator-options-grid">
+                  {ESTIMATOR_STEPS.stages.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      className={`estimator-opt-btn ${
+                        stage.id === opt.id ? 'selected' : ''
+                      }`}
+                      onClick={() => {
+                        soundEngine.playClick(600, 0.025);
+                        setStage(opt);
+                        advanceWizardAfterSelect();
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Step 3: What's the main goal? */}
+            {(!isMobileWizard || mobileStep === 3) && (
+              <div className="estimator-step-group">
+                <span className="estimator-step-label">
+                  3 · What&apos;s the main goal?
+                </span>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+                    gap: 10,
+                  }}
+                >
+                  {ESTIMATOR_STEPS.goals.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      className={`estimator-opt-btn ${
+                        goal.id === opt.id ? 'selected' : ''
+                      }`}
+                      onClick={() => {
+                        soundEngine.playClick(600, 0.025);
+                        setGoal(opt);
+                        advanceWizardAfterSelect();
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: How fast? + Optional Name & Note */}
+            {(!isMobileWizard || mobileStep >= 4) && (
+              <div className="estimator-step-group" style={{ marginBottom: 0 }}>
+                <span className="estimator-step-label">4 · How fast?</span>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                    gap: 10,
+                    marginBottom: 14,
+                  }}
+                >
+                  {ESTIMATOR_STEPS.speeds.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      className={`estimator-opt-btn ${
+                        speed.id === opt.id ? 'selected' : ''
+                      }`}
+                      onClick={() => {
+                        soundEngine.playClick(600, 0.025);
+                        setSpeed(opt);
+                        if (isMobileWizard) setMobileStep(5);
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: 10,
+                  }}
+                >
+                  <div>
+                    <label
+                      htmlFor="est-client-name"
+                      className="mono-tag"
+                      style={{
+                        display: 'block',
+                        marginBottom: 4,
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      Optional: Name
+                    </label>
+                    <input
+                      id="est-client-name"
+                      type="text"
+                      autoComplete="name"
+                      className="input-field"
+                      placeholder="Your name or business"
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="est-brief-note"
+                      className="mono-tag"
+                      style={{
+                        display: 'block',
+                        marginBottom: 4,
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      Optional: One-line note
+                    </label>
+                    <input
+                      id="est-brief-note"
+                      type="text"
+                      className="input-field"
+                      placeholder="e.g. Dhaka clinic booking"
+                      value={briefNote}
+                      onChange={(e) => setBriefNote(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Dynamic Tailored Roadmap Output Card */}
-          <aside className="estimator-result-card" aria-live="polite">
-            <div className="mono-tag" style={{ color: 'var(--accent-telemetry)' }}>
-              // TAILORED PROJECT ROADMAP
-            </div>
-            <div>
-              <div className="telemetry-strip-label">RECOMMENDED ARCHITECTURE</div>
-              <div style={{ fontWeight: 600, fontSize: 14.5, marginTop: 4 }}>
-                {projectType.stack}
+          {/* Result Summary Card (Sticky on Desktop; Shown on Step 5 on Mobile Wizard) */}
+          {(!isMobileWizard || mobileStep === 5) && (
+            <aside className="estimator-result-card" aria-live="polite">
+              <div
+                className="mono-tag"
+                style={{ color: 'var(--accent-telemetry)' }}
+              >
+                // PROJECT ROADMAP BRIEF
               </div>
-            </div>
 
-            <div>
-              <div className="telemetry-strip-label">ESTIMATED CADENCE &amp; PHASE</div>
-              <div style={{ fontWeight: 600, fontSize: 14.5, marginTop: 4 }}>
-                {speed.cadence} · {stage.phaseNote}
+              <div>
+                <div className="telemetry-strip-label">
+                  RECOMMENDED ARCHITECTURE
+                </div>
+                <div style={{ fontWeight: 600, fontSize: 15, marginTop: 4 }}>
+                  {projectType.stack}
+                </div>
               </div>
-            </div>
 
-            <div>
-              <div className="telemetry-strip-label" style={{ marginBottom: 8 }}>
-                KEY DELIVERABLES INCLUDED
+              <div>
+                <div className="telemetry-strip-label">SUGGESTED PHASES</div>
+                <div style={{ fontWeight: 500, fontSize: 14.5, marginTop: 4 }}>
+                  {projectType.phases} ({stage.phaseNote})
+                </div>
               </div>
-              <ul
+
+              <div>
+                <div className="telemetry-strip-label">
+                  TYPICAL TIMELINE RANGE
+                </div>
+                <div style={{ fontWeight: 600, fontSize: 15, marginTop: 4 }}>
+                  {speed.timelineRange}
+                </div>
+              </div>
+
+              <div>
+                <div
+                  className="telemetry-strip-label"
+                  style={{ marginBottom: 8 }}
+                >
+                  WHAT&apos;S INCLUDED
+                </div>
+                <ul
+                  style={{
+                    listStyle: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
+                  }}
+                >
+                  {projectType.deliverables.map((d) => (
+                    <li
+                      key={d}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 8,
+                        fontSize: 14,
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      <Check
+                        size={15}
+                        style={{
+                          color: 'var(--accent-emerald)',
+                          marginTop: 3,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span>{d}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div
                 style={{
-                  listStyle: 'none',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 8,
+                  gap: 10,
+                  paddingTop: 6,
                 }}
               >
-                {projectType.deliverables.map((d) => (
-                  <li
-                    key={d}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: 8,
-                      fontSize: 13.5,
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    <Check
-                      size={15}
-                      style={{
-                        color: 'var(--accent-emerald)',
-                        marginTop: 2,
-                        flexShrink: 0,
-                      }}
-                    />
-                    <span>{d}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 10,
-                paddingTop: 8,
-              }}
-            >
-              <a
-                href={buildWhatsAppUrl(generatedBriefText)}
-                target="_blank"
-                rel="noreferrer"
-                id="estimator-whatsapp-btn"
-                className="btn-primary"
-                style={{ width: '100%' }}
-              >
-                <MessageCircle size={16} />
-                <span>Send This Brief on WhatsApp</span>
-              </a>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <a
-                  href={mailtoBriefHref}
-                  id="estimator-email-btn"
-                  className="btn-secondary"
-                  style={{ padding: '11px 12px', fontSize: 13 }}
+                  href={buildWhatsAppUrl(generatedBriefText)}
+                  target="_blank"
+                  rel="noreferrer"
+                  id="estimator-whatsapp-btn"
+                  className="btn-primary"
+                  style={{ width: '100%' }}
                 >
-                  <Mail size={14} />
-                  <span>Send via Email</span>
+                  <MessageCircle size={16} />
+                  <span>Send this brief on WhatsApp</span>
                 </a>
-                <button
-                  type="button"
-                  id="estimator-copy-btn"
-                  className="btn-secondary"
-                  style={{ padding: '11px 12px', fontSize: 13 }}
-                  onClick={handleCopyBrief}
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 8,
+                  }}
                 >
-                  {copiedBrief ? <Check size={14} /> : <Copy size={14} />}
-                  <span>{copiedBrief ? 'Copied ✓' : 'Copy Brief'}</span>
-                </button>
+                  <a
+                    href={mailtoBriefHref}
+                    id="estimator-email-btn"
+                    className="btn-secondary"
+                    style={{ padding: '10px 12px', fontSize: 13.5 }}
+                  >
+                    <Mail size={14} />
+                    <span>Send via email</span>
+                  </a>
+                  <button
+                    type="button"
+                    id="estimator-copy-btn"
+                    className="btn-secondary"
+                    style={{ padding: '10px 12px', fontSize: 13.5 }}
+                    onClick={handleCopyBrief}
+                  >
+                    {copiedBrief ? <Check size={14} /> : <Copy size={14} />}
+                    <span>{copiedBrief ? 'COPIED ✓' : 'Copy brief'}</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          </aside>
+            </aside>
+          )}
         </div>
       </div>
     </section>

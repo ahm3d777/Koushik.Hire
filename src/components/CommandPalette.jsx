@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   Copy,
+  EyeOff,
   FileText,
   Layers,
   MessageCircle,
@@ -9,6 +10,7 @@ import {
   Search,
   Sun,
   Terminal,
+  Volume2,
   X,
 } from 'lucide-react';
 import { PROJECTS } from '../data/portfolioData';
@@ -19,8 +21,18 @@ import { soundEngine } from '../utils/soundEngine';
 const INITIAL_TERMINAL_LINES = [
   {
     type: 'sys',
-    text: 'KA_OS v2.6 // Obsidian Telemetry Shell — Type `help` to list commands.',
+    text: 'KA_OS v2.0 // Obsidian Telemetry Shell — Tap a chip or type `help`.',
   },
+];
+
+const QUICK_TERMINAL_CHIPS = [
+  'whoami',
+  'projects',
+  'stack',
+  'dhaka',
+  'setup',
+  'hire',
+  'shokti',
 ];
 
 export default function CommandPalette() {
@@ -35,8 +47,13 @@ export default function CommandPalette() {
     toggleXray,
     theme,
     toggleTheme,
+    reducedMotion,
+    toggleReducedMotion,
+    soundEnabled,
+    toggleSound,
     setActiveCaseStudy,
     setShoktiModalOpen,
+    announce,
   } = usePortfolio();
 
   const [query, setQuery] = useState('');
@@ -56,24 +73,24 @@ export default function CommandPalette() {
     }, 30);
   }, [paletteOpen, paletteTab]);
 
+  // Pinned top order matches v2 §4.4: Copy email · WhatsApp · Download résumé · Switch lens
   const commands = useMemo(
     () => [
       {
         id: 'copy-email',
-        label: `Copy Email (${SITE_CONFIG.email})`,
-        group: 'Quick Actions',
+        label: `Copy email (${SITE_CONFIG.email})`,
         icon: Copy,
         shortcut: 'EMAIL',
         run: () => {
           navigator.clipboard?.writeText(SITE_CONFIG.email).catch(() => {});
           soundEngine.playSuccess();
+          announce(`Copied ${SITE_CONFIG.email}`);
           closePalette();
         },
       },
       {
         id: 'open-whatsapp',
-        label: 'Open WhatsApp Direct',
-        group: 'Quick Actions',
+        label: 'Open WhatsApp direct',
         icon: MessageCircle,
         shortcut: 'WA.ME',
         run: () => {
@@ -82,13 +99,12 @@ export default function CommandPalette() {
         },
       },
       {
-        id: 'toggle-xray',
-        label: xray ? 'Disable X-Ray Architecture Mode' : 'Enable X-Ray Architecture Mode',
-        group: 'Quick Actions',
-        icon: ScanLine,
-        shortcut: '⌘X',
+        id: 'download-resume',
+        label: 'Download résumé (PDF)',
+        icon: FileText,
+        shortcut: 'CV',
         run: () => {
-          toggleXray();
+          window.open(SITE_CONFIG.resumeUrl, '_blank', 'noopener,noreferrer');
           closePalette();
         },
       },
@@ -96,9 +112,8 @@ export default function CommandPalette() {
         id: 'switch-lens',
         label:
           lens === 'engineer'
-            ? 'Switch to Business Client Mode'
-            : 'Switch to Engineering Team Mode',
-        group: 'Quick Actions',
+            ? 'Switch lens → Client Mode'
+            : 'Switch lens → Engineering Mode',
         icon: Layers,
         shortcut: 'LENS',
         run: () => {
@@ -107,12 +122,23 @@ export default function CommandPalette() {
         },
       },
       {
+        id: 'toggle-xray',
+        label: xray
+          ? 'Disable X-Ray Architecture Mode'
+          : 'Enable X-Ray Architecture Mode',
+        icon: ScanLine,
+        shortcut: 'X',
+        run: () => {
+          toggleXray();
+          closePalette();
+        },
+      },
+      {
         id: 'switch-theme',
         label:
           theme === 'obsidian'
-            ? 'Switch to Daylight Paper Theme'
-            : 'Switch to Obsidian Dark Theme',
-        group: 'Quick Actions',
+            ? 'Switch to Daylight Paper theme'
+            : 'Switch to Obsidian dark theme',
         icon: Sun,
         shortcut: 'THEME',
         run: () => {
@@ -121,22 +147,30 @@ export default function CommandPalette() {
         },
       },
       {
-        id: 'download-resume',
-        label: 'Open / Print Résumé PDF',
-        group: 'Quick Actions',
-        icon: FileText,
-        shortcut: 'CV',
+        id: 'toggle-reduced-motion',
+        label: reducedMotion ? 'Enable full motion' : 'Reduce motion',
+        icon: EyeOff,
+        shortcut: 'A11Y',
         run: () => {
-          window.open(SITE_CONFIG.resumeUrl, '_blank', 'noopener,noreferrer');
+          toggleReducedMotion();
           closePalette();
         },
       },
-      ...PROJECTS.map((proj) => ({
+      {
+        id: 'toggle-sound',
+        label: soundEnabled ? 'Mute micro-audio' : 'Enable micro-audio',
+        icon: Volume2,
+        shortcut: 'AUDIO',
+        run: () => {
+          toggleSound();
+          closePalette();
+        },
+      },
+      ...PROJECTS.map((proj, idx) => ({
         id: `cs-${proj.id}`,
         label: `Case Study: ${proj.title}`,
-        group: 'Deep-Dive Case Studies',
         icon: ArrowRight,
-        shortcut: `0${PROJECTS.indexOf(proj) + 1}`,
+        shortcut: `0${idx + 1}`,
         run: () => {
           closePalette();
           setActiveCaseStudy(proj);
@@ -144,8 +178,7 @@ export default function CommandPalette() {
       })),
       {
         id: 'shokti-roadmap',
-        label: 'Inspect Shokti (শক্তি) Lab Product Roadmap',
-        group: 'Deep-Dive Case Studies',
+        label: 'Inspect Shokti Lab Roadmap',
         icon: Layers,
         shortcut: 'LAB',
         run: () => {
@@ -162,7 +195,6 @@ export default function CommandPalette() {
       ].map(([hash, label]) => ({
         id: `nav-${hash}`,
         label,
-        group: 'Navigation',
         icon: ArrowRight,
         shortcut: 'GO',
         run: () => {
@@ -172,12 +204,17 @@ export default function CommandPalette() {
       })),
     ],
     [
+      announce,
       closePalette,
       lens,
+      reducedMotion,
       setActiveCaseStudy,
       setLens,
       setShoktiModalOpen,
+      soundEnabled,
       theme,
+      toggleReducedMotion,
+      toggleSound,
       toggleTheme,
       toggleXray,
       xray,
@@ -197,7 +234,7 @@ export default function CommandPalette() {
     if (cmd === 'help') {
       nextLines.push({
         type: 'out',
-        text: 'Available commands: whoami · projects · stack · dhaka · setup · hire · gym · shokti · xray · theme · clear',
+        text: 'Commands: whoami · projects · stack · dhaka · setup · hire · gym · shokti · xray · theme · clear',
       });
     } else if (cmd === 'whoami') {
       nextLines.push({
@@ -207,17 +244,17 @@ export default function CommandPalette() {
     } else if (cmd === 'projects') {
       nextLines.push({
         type: 'out',
-        text: '01 Fitness Factory (CF Pages) · 02 Chikara (React Native/Expo) · 03 ElevateCV (AI Resume Web App) · 04 BD Premium Jersey Store · [LAB] Shokti',
+        text: '01 Fitness Factory (Concept Pitch) · 02 Chikara (React Native/Expo) · 03 ElevateCV (AI Résumé App) · 04 BD Premium Jersey Store · [LAB] Shokti',
       });
     } else if (cmd === 'stack') {
       nextLines.push({
         type: 'out',
-        text: 'Frontend: React, Tailwind, Sass, Figma | Mobile: React Native, Expo | Edge/Cloud: Cloudflare Pages, Vercel, Supabase, Railway | QA/AI: Playwright, Vitest, FFmpeg, faster-whisper',
+        text: 'Frontend: React, TypeScript, Tailwind, Sass, Figma | Mobile: React Native, Expo | Edge/Cloud: Cloudflare Workers/Pages, Vercel, Supabase, Railway | QA/AI: Playwright, Vitest, FFmpeg, faster-whisper',
       });
     } else if (cmd === 'dhaka') {
       nextLines.push({
         type: 'out',
-        text: 'Base: Mohammadpur, Dhaka, Bangladesh (UTC+6). Fluent in English & Bangla. Shipping globally.',
+        text: 'Base: Mohammadpur, Dhaka, Bangladesh (UTC+6). Fluent in English & Bangla. Remote-ready worldwide.',
       });
     } else if (cmd === 'setup') {
       nextLines.push({
@@ -227,13 +264,13 @@ export default function CommandPalette() {
     } else if (cmd === 'hire') {
       nextLines.push({
         type: 'out',
-        text: `Direct Email: ${SITE_CONFIG.email} (copied to clipboard!) · GitHub: github.com/ahm3d777`,
+        text: `Direct Email: ${SITE_CONFIG.email} (copied!) · GitHub: github.com/ahm3d777`,
       });
       navigator.clipboard?.writeText(SITE_CONFIG.email).catch(() => {});
     } else if (cmd === 'gym' || cmd === 'shokti') {
       nextLines.push({
         type: 'out',
-        text: '[EASTER EGG] Training 4–5x/week with progressive overload. That exact discipline sparked Shokti (শক্তি) — a distraction-free React Native workout tracker built for Bangladeshi gym floors.',
+        text: '[EASTER EGG] Training 4–5x/week with progressive overload. That discipline sparked Shokti — a distraction-free React Native workout tracker built for Bangladeshi gym floors.',
       });
     } else if (cmd === 'xray') {
       toggleXray();
@@ -256,7 +293,7 @@ export default function CommandPalette() {
     } else {
       nextLines.push({
         type: 'out',
-        text: `Command not recognized: "${cmd}". Type \`help\` for available commands.`,
+        text: `Unknown command: "${cmd}". Tap a chip above or type \`help\`.`,
       });
     }
 
@@ -269,7 +306,7 @@ export default function CommandPalette() {
 
   return (
     <div
-      className="modal-backdrop"
+      className="modal-backdrop palette-backdrop"
       role="dialog"
       aria-modal="true"
       aria-label="Global Command Palette and Terminal"
@@ -278,14 +315,13 @@ export default function CommandPalette() {
       }}
     >
       <div className="palette-dialog">
-        {/* Top Mode Tabs */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '10px 14px',
-            borderBottom: '1px solid var(--border-seam)',
+            borderBottom: 'var(--hairline) solid var(--border-seam)',
             background: 'var(--bg-canvas)',
           }}
         >
@@ -299,7 +335,7 @@ export default function CommandPalette() {
               onClick={() => setPaletteTab('commands')}
             >
               <Search size={12} />
-              <span>Spotlight</span>
+              <span>Commands</span>
             </button>
             <button
               type="button"
@@ -317,11 +353,11 @@ export default function CommandPalette() {
           <button
             type="button"
             className="hud-icon-btn"
-            style={{ width: 28, height: 28 }}
+            style={{ width: 36, height: 36 }}
             onClick={closePalette}
             aria-label="Close Command Palette"
           >
-            <X size={14} />
+            <X size={15} />
           </button>
         </div>
 
@@ -333,7 +369,7 @@ export default function CommandPalette() {
                 alignItems: 'center',
                 gap: 10,
                 padding: '12px 16px',
-                borderBottom: '1px solid var(--border-seam)',
+                borderBottom: 'var(--hairline) solid var(--border-seam)',
               }}
             >
               <Search size={16} style={{ color: 'var(--text-muted)' }} />
@@ -350,13 +386,13 @@ export default function CommandPalette() {
                   }
                   setQuery(val);
                 }}
-                placeholder="Type a command, project, or '>' for Terminal..."
+                placeholder="Search commands, projects, or '>' for Terminal..."
                 style={{
                   width: '100%',
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  fontSize: 14.5,
+                  fontSize: 16,
                 }}
               />
             </div>
@@ -390,45 +426,65 @@ export default function CommandPalette() {
                       <Icon size={15} />
                       <span>{cmd.label}</span>
                     </span>
-                    <span className="mono-tag" style={{ color: 'var(--text-muted)' }}>
+                    <span
+                      className="mono-tag"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       {cmd.shortcut}
                     </span>
                   </button>
                 );
               })}
-              {filteredCommands.length === 0 && (
-                <div
-                  style={{
-                    padding: 20,
-                    textAlign: 'center',
-                    color: 'var(--text-muted)',
-                    fontSize: 13.5,
-                  }}
-                >
-                  No matching commands. Switch to <code>&gt;_ Terminal</code> to
-                  run shell queries.
-                </div>
-              )}
             </div>
           </>
         ) : (
           <div
             style={{
-              padding: 18,
+              padding: 16,
               background: '#09090b',
               color: '#f4f4f6',
               fontFamily: 'var(--font-mono)',
               fontSize: 12.5,
             }}
           >
+            {/* Tappable Command Chips for Touch Ergonomics (§4.4) */}
             <div
               style={{
-                maxHeight: 280,
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 6,
+                marginBottom: 12,
+                paddingBottom: 10,
+                borderBottom: '1px solid #27272f',
+              }}
+            >
+              {QUICK_TERMINAL_CHIPS.map((chip) => (
+                <button
+                  key={chip}
+                  type="button"
+                  onClick={() => executeTerminalCommand(chip)}
+                  style={{
+                    padding: '6px 10px',
+                    borderRadius: 6,
+                    background: '#18181f',
+                    border: '1px solid #27272f',
+                    color: '#f4f4f6',
+                    fontSize: 12,
+                  }}
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+
+            <div
+              style={{
+                maxHeight: 240,
                 overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
-                marginBottom: 14,
+                marginBottom: 12,
               }}
             >
               {termLines.map((line, i) => (
@@ -462,7 +518,7 @@ export default function CommandPalette() {
                 borderTop: '1px solid #27272f',
               }}
             >
-              <span style={{ color: '#e11d48', fontWeight: 600 }}>
+              <span style={{ color: '#f43f5e', fontWeight: 600 }}>
                 koushik@dhaka:~$
               </span>
               <input
@@ -471,7 +527,7 @@ export default function CommandPalette() {
                 type="text"
                 value={termInput}
                 onChange={(e) => setTermInput(e.target.value)}
-                placeholder="whoami | projects | stack | setup | shokti"
+                placeholder="Type command..."
                 style={{
                   flex: 1,
                   background: 'transparent',
@@ -479,7 +535,7 @@ export default function CommandPalette() {
                   outline: 'none',
                   color: '#f4f4f6',
                   fontFamily: 'var(--font-mono)',
-                  fontSize: 12.5,
+                  fontSize: 16,
                 }}
               />
             </form>
