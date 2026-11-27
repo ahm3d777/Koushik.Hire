@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Koushik Ahmed — Résumé (Full-Stack Web & Mobile Developer)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #09090b;
+      --muted: #52525b;
+      --accent: #be123c;
+      --border: #e4e4e7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      color: var(--ink);
+      background: #f4f4f6;
+      line-height: 1.55;
+      padding: 32px 16px;
+    }
+    .toolbar {
+      max-width: 820px;
+      margin: 0 auto 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .toolbar button, .toolbar a {
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .toolbar a { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+    .sheet {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 48px 52px;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 32px rgba(9, 9, 11, 0.06);
+    }
+    header {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 18px;
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    h1 { font-size: 28px; letter-spacing: -0.02em; }
+    .role { font-size: 14px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+    .meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+    }
+    section { margin-bottom: 20px; }
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+      margin-bottom: 10px;
+    }
+    .item { margin-bottom: 12px; }
+    .item-head { display: flex; justify-content: space-between; font-weight: 600; font-size: 14px; }
+    .item-sub { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+    p, li { font-size: 13.5px; color: #27272a; }
+    ul { padding-left: 18px; margin-top: 4px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; font-size: 13px; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .toolbar { display: none; }
+      .sheet { box-shadow: none; border: none; padding: 16px; }
+    }
+    @media (max-width: 640px) {
+      .sheet { padding: 28px 22px; }
+      .meta { text-align: left; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="/">← Back to Portfolio</a>
+    <button onclick="window.print()">Print / Save as PDF</button>
+  </div>
+  <main class="sheet">
+    <header>
+      <div>
+        <h1>Koushik Ahmed</h1>
+        <div class="role">Full-Stack Web &amp; Mobile Engineer · React, React Native &amp; Edge Systems</div>
+      </div>
+      <div class="meta">
+        <div>Mohammadpur, Dhaka, Bangladesh (GMT+6)</div>
+        <div>k.ahm3d777@gmail.com · github.com/ahm3d777</div>
+      </div>
+    </header>
+
+    <section>
+      <h2>Summary</h2>
+      <p>Product-minded final-year Computer Science student and full-stack developer building fast React web interfaces, cross-platform React Native &amp; Expo mobile apps, and Cloudflare-deployed digital systems for businesses and engineering teams in Dhaka and worldwide.</p>
+    </section>
+
+    <section>
+      <h2>Selected Engineering Projects</h2>
+      <div class="item">
+        <div class="item-head"><span>Fitness Factory — Digital Front Desk</span><span class="item-sub">Sep 2026 · Cloudflare Pages</span></div>
+        <ul>
+          <li>Engineered a custom, edge-deployed digital front desk web prototype for Fitness Factory (Dhanmondi, Dhaka) using React.js and Tailwind CSS on Cloudflare Pages.</li>
+          <li>Designed mobile-first inquiry, class schedule, and trial-pass workflows to replace manual social media lead handling.</li>
+        </ul>
+      </div>
+      <div class="item">
+        <div class="item-head"><span>Chikara — Cross-Platform Mobile Application</span><span class="item-sub">Oct 2025 · React Native &amp; Expo</span></div>
+        <ul>
+          <li>Architected and built a cross-platform iOS/Android mobile application with responsive touch physics, modular navigation, and unified codebase maintainability.</li>
+        </ul>
+      </div>
+      <div class="item">
+        <div class="item-head"><span>ElevateCV — AI-Powered Resume Builder</span><span class="item-sub">2025 · React.js &amp; AI Integration</span></div>
+        <ul>
+          <li>Developed a split-screen AI-assisted resume builder featuring real-time ATS-clean document rendering, intelligent content phrasing suggestions, and multi-template state management.</li>
+        </ul>
+      </div>
+      <div class="item">
+        <div class="item-head"><span>Bangladesh Premium Jersey Store</span><span class="item-sub">Dec 2025 · E-Commerce Web</span></div>
+        <ul>
+          <li>Built a high-visual sports apparel storefront tailored for mobile retail conversion with clean variant selection and streamlined cart checkout UX.</li>
+        </ul>
+      </div>
+      <div class="item">
+        <div class="item-head"><span>Shokti (শক্তি) — Fitness &amp; Progressive Overload App (In Lab)</span><span class="item-sub">Active R&amp;D · React Native</span></div>
+        <ul>
+          <li>Designing and developing a distraction-free progressive overload and AI-assisted workout tracker tailored for Bangladeshi gym routines.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Creative Systems &amp; AI Media Pipelines</h2>
+      <ul>
+        <li><strong>Centria (Kokkola, Finland — PlastLab):</strong> Broadcast-clean 4K to 1080×1920 vertical video production backed by automated local AI captioning (<code>faster-whisper</code> + FFmpeg).</li>
+        <li><strong>Jaharah Translation &amp; Consultancy (Dhaka):</strong> Bilingual short-form Reels strategy and AI-assisted production (Google Flow / Gemini Omni) driving direct WhatsApp inquiries.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Technical Architecture</h2>
+      <div class="grid">
+        <div><strong>Interface &amp; Design:</strong> React.js, JavaScript (ES6+), HTML5, CSS3, Tailwind CSS, Sass, Figma</div>
+        <div><strong>Mobile Engineering:</strong> React Native, Expo, Cross-Platform Navigation</div>
+        <div><strong>Edge, Cloud &amp; Backend:</strong> Cloudflare Pages &amp; Wrangler, Vercel, Supabase, Railway, Render, GitHub</div>
+        <div><strong>Quality &amp; AI Tooling:</strong> Playwright, Vitest, ESLint, Claude Code CLI, FFmpeg, faster-whisper</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Education &amp; Languages</h2>
+      <div class="item-head"><span>B.Sc. in Computer Science (Final Year)</span><span class="item-sub">Dhaka, Bangladesh</span></div>
+      <p style="margin-top:4px;"><strong>Languages:</strong> Fluent in English &amp; Bangla (Native) · Available for Global Remote Roles &amp; Select Client Builds</p>
+    </section>
+  </main>
+</body>
+</html>
