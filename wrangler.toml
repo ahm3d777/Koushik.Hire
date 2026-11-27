@@ -1,6 +1,6 @@
 name = "koushik-ahmed-portfolio"
-pages_build_output_dir = "dist"
-compatibility_date = "2026-01-01"
+compatibility_date = "2026-11-27"
 
-# Optional environment variables for /api/contact webhook notifications in Cloudflare Pages:
-# Set RESEND_API_KEY or DISCORD_WEBHOOK_URL in Cloudflare Dashboard -> Pages -> Settings -> Environment Variables
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
